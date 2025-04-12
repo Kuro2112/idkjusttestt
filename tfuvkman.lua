@@ -1,6 +1,6 @@
--- KUROHUB v2.2 (Tối ưu cho APEX-3-DUEL-Warriors)
--- Tính năng: Silent Aim Siêu Cấp, Mở Rộng Hitbox Cực Đại, Show Hitbox Sửa Lỗi, Anti-Ban Siêu Tinh Vi (Giả Lập)
--- Giao diện: Menu Trắng-Đen Sang Trọng, Thu Nhỏ Thành Khối Vuông Đen, Hiệu ứng Mượt
+-- KUROHUB v2.0 (Tối ưu cho APEX-3-DUEL-Warriors)
+-- Tính năng: Silent Aim Siêu Cấp, Mở Rộng Hitbox Cực Đại, Show Hitbox Sửa Lỗi, Anti-Ban (Giả Lập)
+-- Giao diện: Menu Trắng-Đen Sang Trọng, Thu Nhỏ/Phóng To, Hiệu ứng Mượt
 
 local Player = game:GetService("Players").LocalPlayer
 local Mouse = Player:GetMouse()
@@ -67,7 +67,7 @@ TitleBar.BackgroundTransparency = 0.4
 TitleBar.Parent = MainFrame
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Text = "KUROHUB v2.2 | " .. GAME_NAME
+TitleLabel.Text = "KUROHUB v2.0 | " .. GAME_NAME
 TitleLabel.TextColor3 = Color3.new(1, 1, 1)
 TitleLabel.TextScaled = true
 TitleLabel.Size = UDim2.new(0.6, 0, 1, 0)
@@ -105,96 +105,53 @@ local UICornerMinimize = Instance.new("UICorner")
 UICornerMinimize.CornerRadius = UDim.new(0, 8)
 UICornerMinimize.Parent = MinimizeButton
 
--- Khối vuông khi thu nhỏ
-local MinimizedSquare = Instance.new("TextButton")
-MinimizedSquare.Size = UDim2.new(0, 50, 0, 50)
-MinimizedSquare.BackgroundColor3 = Color3.new(0, 0, 0)
-MinimizedSquare.BackgroundTransparency = 0.3
-MinimizedSquare.Text = "+"
-MinimizedSquare.TextColor3 = Color3.new(1, 1, 1)
-MinimizedSquare.TextScaled = true
-MinimizedSquare.Font = Enum.Font.GothamBold
-MinimizedSquare.Visible = false
-MinimizedSquare.Parent = KUROHUB
-
-local SquareUICorner = Instance.new("UICorner")
-SquareUICorner.CornerRadius = UDim.new(0, 12)
-SquareUICorner.Parent = MinimizedSquare
-
-local SquareUIStroke = Instance.new("UIStroke")
-SquareUIStroke.Color = Color3.new(0.8, 0.8, 0.8)
-SquareUIStroke.Thickness = 2
-SquareUIStroke.Transparency = 0.2
-SquareUIStroke.Parent = MinimizedSquare
-
 -- Kéo thả giao diện
 local dragging, dragInput, dragStart, startPos
-local function SetupDragging(frame)
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-    frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
-            dragInput = input
-        end
-    end)
-end
-SetupDragging(TitleBar)
-SetupDragging(MinimizedSquare)
-
+TitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+TitleBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        dragInput = input
+    end
+end)
 UserInputService.InputChanged:Connect(function(input)
     if input == dragInput and dragging then
         local delta = input.Position - dragStart
-        local targetFrame = MinimizedSquare.Visible and MinimizedSquare or MainFrame
-        targetFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 
 -- Thu nhỏ/Phóng to
 local isMinimized = false
-local function ToggleMinimize()
+MinimizeButton.MouseButton1Click:Connect(function()
     SoundService:PlayLocalSound(ClickSound)
     isMinimized = not isMinimized
-    
     if isMinimized then
-        -- Thu nhỏ thành khối vuông
-        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        TweenService:Create(MainFrame, tweenInfo, {Size = UDim2.new(0, 50, 0, 50)}):Play()
-        TweenService:Create(MainFrame, tweenInfo, {Position = MainFrame.Position}):Play() -- Giữ vị trí
-        wait(0.3)
-        MainFrame.Visible = false
-        MinimizedSquare.Position = MainFrame.Position
-        MinimizedSquare.Visible = true
+        MainFrame.Size = UDim2.new(0, 320, 0, 40)
         MinimizeButton.Text = "+"
         for _, child in pairs(MainFrame:GetChildren()) do
-            child.Visible = false
+            if child ~= TitleBar then
+                child.Visible = false
+            end
         end
     else
-        -- Mở lại menu
-        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        MainFrame.Visible = true
-        MainFrame.Position = MinimizedSquare.Position
-        TweenService:Create(MainFrame, tweenInfo, {Size = UDim2.new(0, 320, 0, 420)}):Play()
-        wait(0.3)
-        MinimizedSquare.Visible = false
+        MainFrame.Size = UDim2.new(0, 320, 0, 420)
         MinimizeButton.Text = "-"
         for _, child in pairs(MainFrame:GetChildren()) do
             child.Visible = true
         end
     end
-end
-
-MinimizeButton.MouseButton1Click:Connect(ToggleMinimize)
-MinimizedSquare.MouseButton1Click:Connect(ToggleMinimize)
+end)
 
 -- Tab System
 local TabFrame = Instance.new("Frame")
@@ -212,7 +169,7 @@ ContentFrame.ClipsDescendants = true
 ContentFrame.Parent = MainFrame
 
 local StatusBar = Instance.new("TextLabel")
-StatusBar.Text = "FPS: -- | Mục tiêu: 0 | Rủi ro: An Toàn"
+StatusBar.Text = "FPS: -- | Mục tiêu: 0 | Rủi ro ban: 0%"
 StatusBar.TextColor3 = Color3.new(1, 1, 1)
 StatusBar.BackgroundTransparency = 0.7
 StatusBar.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
@@ -221,36 +178,6 @@ StatusBar.Position = UDim2.new(0, 5, 1, -30)
 StatusBar.TextScaled = true
 StatusBar.Font = Enum.Font.Gotham
 StatusBar.Parent = MainFrame
-
--- Thanh tiến trình Anti-Ban
-local ProtectionBarFrame = Instance.new("Frame")
-ProtectionBarFrame.Size = UDim2.new(0.9, 0, 0, 15)
-ProtectionBarFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
-ProtectionBarFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-ProtectionBarFrame.Parent = nil
-
-local ProtectionBarFill = Instance.new("Frame")
-ProtectionBarFill.Size = UDim2.new(0, 0, 1, 0)
-ProtectionBarFill.BackgroundColor3 = Color3.new(1, 1, 1)
-ProtectionBarFill.Parent = ProtectionBarFrame
-
-local UICornerProtection = Instance.new("UICorner")
-UICornerProtection.CornerRadius = UDim.new(0, 4)
-UICornerProtection.Parent = ProtectionBarFrame
-
-local UICornerProtectionFill = Instance.new("UICorner")
-UICornerProtectionFill.CornerRadius = UDim.new(0, 4)
-UICornerProtectionFill.Parent = ProtectionBarFill
-
-local ProtectionLabel = Instance.new("TextLabel")
-ProtectionLabel.Text = "Bypass: 0%"
-ProtectionLabel.TextColor3 = Color3.new(1, 1, 1)
-ProtectionLabel.Size = UDim2.new(0.9, 0, 0, 20)
-ProtectionLabel.Position = UDim2.new(0.05, 0, 0.15, 0)
-ProtectionLabel.BackgroundTransparency = 1
-ProtectionLabel.TextScaled = true
-ProtectionLabel.Font = Enum.Font.Gotham
-ProtectionLabel.Parent = nil
 
 -- Cài đặt
 local Settings = {
@@ -272,9 +199,8 @@ local Settings = {
     HitboxColor = "Red",
     DynamicHitbox = true,
     HitboxParticles = false,
-    AntiBanLevel = "Chiến Thần Vô Hạn",
-    FakeBanRisk = 0,
-    ProtectionProgress = 0
+    AntiBanLevel = "Chiến Binh Tối Thượng",
+    FakeBanRisk = 0
 }
 
 -- Lưu/Gọi cài đặt
@@ -330,81 +256,42 @@ FOVImage.ImageColor3 = Color3.new(1, 0, 0)
 FOVImage.ImageTransparency = 0.7
 FOVImage.Parent = FOVFrame
 
--- Anti-Ban Siêu Tinh Vi (Giả Lập)
+-- Anti-Ban giả lập
 local AntiBanModule = {
     Active = false,
     FakeTelemetry = {},
-    RiskLevel = "An Toàn",
     Log = function(message)
         warn("[KUROHUB Anti-Ban | " .. GAME_NAME .. "]: " .. message)
     end,
     SimulateProtection = function()
         if not Settings.AntiBan then return end
         AntiBanModule.Active = true
-        AntiBanModule.Log("Khởi tạo Anti-Ban Siêu Tinh Vi v3.0 cho " .. GAME_NAME)
+        AntiBanModule.Log("Khởi tạo Anti-Ban v2.7 cho " .. GAME_NAME)
         AntiBanModule.FakeTelemetry = {
             SessionID = HttpService:GenerateGUID(false),
             Timestamp = os.time(),
             FakeChecksum = math.random(1000000, 9999999),
-            FakeWarriorKey = "WRLR-CHIẾN-THẦN-" .. HttpService:GenerateGUID(false):sub(1, 8),
-            FakePing = math.random(5, 50),
-            FakePacketHash = tostring(math.random(100000, 999999)) .. "-" .. math.random(1000, 9999),
-            FakeBehaviorScore = math.random(80, 95),
-            FakeServerKey = "SRV-" .. HttpService:GenerateGUID(false):sub(1, 12)
+            FakeWarriorKey = "WRLR-TỐI-THƯỢNG-" .. math.random(10000, 99999),
+            FakePing = math.random(10, 70)
         }
         AntiBanModule.Log("ID phiên: " .. AntiBanModule.FakeTelemetry.SessionID)
         AntiBanModule.Log("Cấp bảo vệ: " .. Settings.AntiBanLevel)
-        AntiBanModule.Log("Ping giả lập: " .. AntiBanModule.FakeTelemetry.FakePing .. "ms")
-        AntiBanModule.Log("Mã gói tin: " .. AntiBanModule.FakeTelemetry.FakePacketHash)
-        AntiBanModule.Log("Điểm hành vi: " .. AntiBanModule.FakeTelemetry.FakeBehaviorScore .. "/100")
-        wait(0.5)
-        AntiBanModule.Log("Mã xác thực server: " .. AntiBanModule.FakeTelemetry.FakeServerKey)
-        AntiBanModule.Log("Mô phỏng mã hóa dữ liệu client...")
-        AntiBanModule.Log("Anti-Ban Siêu Tinh Vi kích hoạt (GIẢ LẬP, KHÔNG BẢO VỆ THẬT).")
+        AntiBanModule.Log("Ping server: " .. AntiBanModule.FakeTelemetry.FakePing .. "ms")
+        wait(0.3)
+        AntiBanModule.Log("Kiểm tra mã: " .. AntiBanModule.FakeTelemetry.FakeChecksum)
+        AntiBanModule.Log("Khóa chiến binh: " .. AntiBanModule.FakeTelemetry.FakeWarriorKey)
+        AntiBanModule.Log("Anti-Ban kích hoạt (giả lập, không bảo vệ thật).")
     end,
     SimulatePeriodicCheck = function()
-        while Settings.AntiBan and wait(math.random(2, 5)) do
+        while Settings.AntiBan and wait(math.random(3, 6)) do
+            AntiBanModule.Log("Mô phỏng né chống gian lận " .. GAME_NAME .. "...")
             AntiBanModule.FakeTelemetry.FakeChecksum = math.random(1000000, 9999999)
-            AntiBanModule.FakeTelemetry.FakePing = math.random(5, 50)
-            AntiBanModule.FakeTelemetry.FakePacketHash = tostring(math.random(100000, 999999)) .. "-" .. math.random(1000, 9999)
-            AntiBanModule.FakeTelemetry.FakeBehaviorScore = math.clamp(AntiBanModule.FakeTelemetry.FakeBehaviorScore + math.random(-5, 5), 70, 98)
-            Settings.FakeBanRisk = math.clamp(Settings.FakeBanRisk + math.random(-10, 15), 0, 90)
-            Settings.ProtectionProgress = math.clamp(Settings.ProtectionProgress + math.random(5, 20), 0, 100)
-            
-            if Settings.FakeBanRisk < 30 then
-                AntiBanModule.RiskLevel = "An Toàn"
-            elseif Settings.FakeBanRisk < 60 then
-                AntiBanModule.RiskLevel = "Nguy Hiểm"
-            else
-                AntiBanModule.RiskLevel = "Cực Kỳ Nguy Hiểm"
-            end
-            
-            AntiBanModule.Log("Kiểm tra định kỳ: Mã mới: " .. AntiBanModule.FakeTelemetry.FakeChecksum)
+            AntiBanModule.FakeTelemetry.FakePing = math.random(10, 70)
+            Settings.FakeBanRisk = math.clamp(Settings.FakeBanRisk + math.random(-15, 20), 0, 100)
+            AntiBanModule.Log("Mã mới: " .. AntiBanModule.FakeTelemetry.FakeChecksum)
             AntiBanModule.Log("Ping: " .. AntiBanModule.FakeTelemetry.FakePing .. "ms")
-            AntiBanModule.Log("Gói tin: " .. AntiBanModule.FakeTelemetry.FakePacketHash)
-            AntiBanModule.Log("Điểm hành vi: " .. AntiBanModule.FakeTelemetry.FakeBehaviorScore .. "/100")
-            AntiBanModule.Log("Rủi ro ban giả: " .. Settings.FakeBanRisk .. "% (" .. AntiBanModule.RiskLevel .. ")")
-            AntiBanModule.Log("Tiến trình bypass: " .. Settings.ProtectionProgress .. "%")
-            
-            if Settings.SilentAim then
-                local randomSmooth = Settings.AimSmoothness * math.random(90, 110) / 100
-                AntiBanModule.Log("Ngụy trang Silent Aim: Độ mượt ngẫu nhiên " .. string.format("%.3f", randomSmooth))
-            end
-            if Settings.ExpandHitbox then
-                local randomSize = Settings.HitboxSize * math.random(95, 105) / 100
-                AntiBanModule.Log("Ngụy trang Hitbox: Kích thước ngẫu nhiên " .. string.format("%.2f", randomSize) .. "x")
-            end
+            AntiBanModule.Log("Rủi ro ban giả: " .. Settings.FakeBanRisk .. "%")
         end
-    end,
-    SimulatePacketObfuscation = function()
-        if not Settings.AntiBan then return end
-        AntiBanModule.Log("Mô phỏng nhiễu gói tin server...")
-        local fakePackets = math.random(3, 8)
-        for i = 1, fakePackets do
-            AntiBanModule.Log("Gửi gói tin giả #" .. i .. ": PKT-" .. HttpService:GenerateGUID(false):sub(1, 6))
-            wait(0.1)
-        end
-        AntiBanModule.Log("Nhiễu hoàn tất, server bị đánh lừa (giả lập).")
     end
 }
 
@@ -460,15 +347,14 @@ local function SilentAim()
         local TargetPart = ClosestPlayer.Character:FindFirstChild("Head") or ClosestPlayer.Character.HumanoidRootPart
         local Velocity = ClosestPlayer.Character.HumanoidRootPart.Velocity
         local PingFactor = AntiBanModule.FakeTelemetry.FakePing and (AntiBanModule.FakeTelemetry.FakePing / 1000) or 0.04
-        local RandomSmooth = Settings.AimSmoothness * (Settings.AntiBan and math.random(90, 110) / 100 or 1)
-        local PredictedPos = TargetPart.Position + Velocity * (RandomSmooth + PingFactor * 1.5)
+        local PredictedPos = TargetPart.Position + Velocity * (Settings.AimSmoothness + PingFactor * 1.5)
         local MousePos = Camera:WorldToViewportPoint(PredictedPos)
-        local DeltaX = (MousePos.X - Mouse.X) * RandomSmooth
-        local DeltaY = (MousePos.Y - Mouse.Y) * RandomSmooth
+        local DeltaX = (MousePos.X - Mouse.X) * Settings.AimSmoothness
+        local DeltaY = (MousePos.Y - Mouse.Y) * Settings.AimSmoothness
         mousemoverel(DeltaX, DeltaY)
     end
     
-    StatusBar.Text = string.format("FPS: %.1f | Mục tiêu: %d | Rủi ro: %s", 1 / RunService.RenderStepped:Wait(), TargetCount, AntiBanModule.RiskLevel)
+    StatusBar.Text = string.format("FPS: %.1f | Mục tiêu: %d | Rủi ro ban: %d%%", 1 / RunService.RenderStepped:Wait(), TargetCount, Settings.FakeBanRisk)
 end
 
 -- Mở Rộng Hitbox Cực Đại
@@ -501,8 +387,7 @@ local function ExpandHitbox()
         if v ~= Player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
             if Settings.TeamFilter and v.Team == Player.Team then continue end
             local Distance = (v.Character.HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude
-            local RandomSize = Settings.HitboxSize * (Settings.AntiBan and math.random(95, 105) / 100 or 1)
-            local DynamicSize = Settings.DynamicHitbox and math.clamp(RandomSize * (1 + (60 - Distance) / 20), RandomSize, RandomSize * 2) or RandomSize
+            local DynamicSize = Settings.DynamicHitbox and math.clamp(Settings.HitboxSize * (1 + (60 - Distance) / 20), Settings.HitboxSize, Settings.HitboxSize * 2) or Settings.HitboxSize
             
             for partName, Multiplier in pairs(HITBOX_PARTS) do
                 local part = v.Character:FindFirstChild(partName)
@@ -538,6 +423,7 @@ end
 
 -- Show Hitbox (Sửa lỗi)
 local function ShowHitbox()
+    -- Xóa Highlight cũ trước khi bắt đầu
     for _, v in pairs(game.Players:GetPlayers()) do
         if v ~= Player and v.Character and v.Character:FindFirstChild("KURO_Highlight") then
             v.Character.KURO_Highlight:Destroy()
@@ -557,16 +443,17 @@ local function ShowHitbox()
                 Highlight.Name = "KURO_Highlight"
                 Highlight.FillColor = HITBOX_COLORS[Settings.HitboxColor]
                 Highlight.OutlineColor = Color3.new(1, 1, 1)
-                Highlight.FillTransparency = 0.4
+                Highlight.FillTransparency = 0.4 -- Tăng độ rõ
                 Highlight.OutlineTransparency = 0
                 Highlight.Adornee = v.Character
                 Highlight.Parent = v.Character
                 Highlight.Enabled = true
             end
         end
-        wait(0.1)
+        wait(0.1) -- Giảm tần suất để tối ưu
     end
     
+    -- Xóa Highlight khi tắt
     for _, v in pairs(game.Players:GetPlayers()) do
         if v ~= Player and v.Character and v.Character:FindFirstChild("KURO_Highlight") then
             v.Character.KURO_Highlight:Destroy()
@@ -836,4 +723,150 @@ CreateSlider("Tầm ngắm", 0.55, 20, 200, DEFAULT_AIM_RADIUS, "AimRadius", Tab
 CreateSlider("Độ mượt ngắm", 0.7, 0.03, 0.15, DEFAULT_SMOOTHNESS, "AimSmoothness", Tabs.Aim)
 
 CreateButton("Mở rộng Hitbox [R]", 0.05, "ExpandHitbox", Tabs.Hitbox)
-CreateButton("Hitbox động", 0.15, "Dynamic
+CreateButton("Hitbox động", 0.15, "DynamicHitbox", Tabs.Hitbox)
+CreateButton("Hiệu ứng Hitbox", 0.25, "HitboxParticles", Tabs.Hitbox)
+CreateSlider("Kích thước Hitbox", 0.35, 1, 4, DEFAULT_HITBOX_SIZE, "HitboxSize", Tabs.Hitbox)
+
+CreateButton("Hiển thị Hitbox [T]", 0.05, "ShowHitbox", Tabs.Visuals, function()
+    if Settings.ShowHitbox then
+        coroutine.wrap(ShowHitbox)()
+    end
+end)
+CreateButton("Hiển thị phạm vi [Y]", 0.15, "ShowAttackRange", Tabs.Visuals, function()
+    if Settings.ShowAttackRange then
+        coroutine.wrap(ShowAttackRange)()
+    end
+end)
+CreateDropdown("Loại vũ khí", 0.25, {"Kiếm", "Giáo", "Cung"}, "WeaponMode", Tabs.Visuals, function(option)
+    if option == "Kiếm" then
+        Settings.WeaponMode = "Sword"
+        Settings.AttackRange = WEAPON_RANGES.Sword
+    elseif option == "Giáo" then
+        Settings.WeaponMode = "Spear"
+        Settings.AttackRange = WEAPON_RANGES.Spear
+    elseif option == "Cung" then
+        Settings.WeaponMode = "Bow"
+        Settings.AttackRange = WEAPON_RANGES.Bow
+    end
+end)
+CreateDropdown("Màu Hitbox", 0.35, {"Đỏ", "Xanh", "Tím"}, "HitboxColor", Tabs.Visuals, function(option)
+    if option == "Đỏ" then
+        Settings.HitboxColor = "Red"
+    elseif option == "Xanh" then
+        Settings.HitboxColor = "Blue"
+    elseif option == "Tím" then
+        Settings.HitboxColor = "Purple"
+    end
+end)
+
+CreateButton("Anti-Ban", 0.05, "AntiBan", Tabs.AntiBan, function()
+    if Settings.AntiBan then
+        AntiBanModule.SimulateProtection()
+        coroutine.wrap(AntiBanModule.SimulatePeriodicCheck)()
+    else
+        AntiBanModule.Active = false
+        AntiBanModule.Log("Anti-Ban tắt.")
+    end
+end)
+local RiskLabel = Instance.new("TextLabel")
+RiskLabel.Text = "Rủi ro ban giả: " .. Settings.FakeBanRisk .. "%"
+RiskLabel.TextColor3 = Color3.new(1, 1, 1)
+RiskLabel.Size = UDim2.new(0.9, 0, 0, 25)
+RiskLabel.Position = UDim2.new(0.05, 0, 0.15, 0)
+RiskLabel.BackgroundTransparency = 1
+RiskLabel.TextScaled = true
+RiskLabel.Font = Enum.Font.Gotham
+RiskLabel.Parent = Tabs.AntiBan
+
+-- Cảnh báo
+local WarnLabel = Instance.new("TextLabel")
+WarnLabel.Text = "DÙNG CÓ RỦI RO! ANTI-BAN CHỈ LÀ GIẢ LẬP!"
+WarnLabel.TextColor3 = Color3.new(1, 0.2, 0.2)
+WarnLabel.Position = UDim2.new(0.05, 0, 1, -55)
+WarnLabel.Size = UDim2.new(0.9, 0, 0, 25)
+WarnLabel.BackgroundTransparency = 1
+WarnLabel.TextScaled = true
+WarnLabel.Font = Enum.Font.GothamBold
+WarnLabel.Parent = MainFrame
+
+-- Kiểm tra an toàn
+local function Initialize()
+    if not Player.Character or not Player.Character:FindFirstChild("HumanoidRootPart") then
+        warn("[KUROHUB] Đợi nhân vật trong " .. GAME_NAME .. "...")
+        Player.CharacterAdded:Wait()
+    end
+    if not game:IsLoaded() then
+        game.Loaded:Wait()
+    end
+    LoadSettings()
+    AntiBanModule.Log("KUROHUB v2.0 khởi tạo cho " .. GAME_NAME .. ".")
+end
+
+-- Vòng lặp chính
+local frameCount = 0
+RunService.RenderStepped:Connect(function(delta)
+    frameCount = frameCount + 1
+    if frameCount % 2 == 0 then
+        pcall(SilentAim)
+        pcall(ExpandHitbox)
+    end
+    RiskLabel.Text = "Rủi ro ban giả: " .. Settings.FakeBanRisk .. "%"
+end)
+
+-- Dọn dẹp
+Player.AncestryChanged:Connect(function()
+    if not Player:IsDescendantOf(game) then
+        KUROHUB:Destroy()
+        FOVCircle:Destroy()
+    end
+end)
+
+-- Phím tắt
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Settings.AimKey then
+        Settings.SilentAim = not Settings.SilentAim
+        SaveSettings()
+        AntiBanModule.Log("Silent Aim: " .. (Settings.SilentAim and "BẬT" or "TẮT"))
+    elseif input.KeyCode == Enum.KeyCode.E then
+        Settings.ShowFOV = not Settings.ShowFOV
+        SaveSettings()
+    elseif input.KeyCode == Enum.KeyCode.R then
+        Settings.ExpandHitbox = not Settings.ExpandHitbox
+        SaveSettings()
+    elseif input.KeyCode == Enum.KeyCode.T then
+        Settings.ShowHitbox = not Settings.ShowHitbox
+        SaveSettings()
+        if Settings.ShowHitbox then
+            coroutine.wrap(ShowHitbox)()
+        end
+    elseif input.KeyCode == Enum.KeyCode.Y then
+        Settings.ShowAttackRange = not Settings.ShowAttackRange
+        SaveSettings()
+        if Settings.ShowAttackRange then
+            coroutine.wrap(ShowAttackRange)()
+        end
+    elseif input.KeyCode == Enum.KeyCode.H then
+        KUROHUB.Enabled = not KUROHUB.Enabled
+    elseif input.KeyCode == Enum.KeyCode.M then
+        isMinimized = not isMinimized
+        if isMinimized then
+            MainFrame.Size = UDim2.new(0, 320, 0, 40)
+            MinimizeButton.Text = "+"
+            for _, child in pairs(MainFrame:GetChildren()) do
+                if child ~= TitleBar then
+                    child.Visible = false
+                end
+            end
+        else
+            MainFrame.Size = UDim2.new(0, 320, 0, 420)
+            MinimizeButton.Text = "-"
+            for _, child in pairs(MainFrame:GetChildren()) do
+                child.Visible = true
+            end
+        end
+    end
+end)
+
+-- Khởi tạo
+Initialize()
