@@ -1,6 +1,6 @@
--- KUROHUB v2.0 (Tối ưu cho APEX-3-DUEL-Warriors)
+-- KUROHUB v2.2 (Tối ưu cho APEX-3-DUEL-Warriors)
 -- Tính năng: Silent Aim Siêu Cấp, Mở Rộng Hitbox Cực Đại, Show Hitbox Sửa Lỗi, Anti-Ban Siêu Tinh Vi (Giả Lập)
--- Giao diện: Phong cách Redz Hub (Neon, Đen/Xám, Hiệu ứng Mượt), Thu Nhỏ Thành Khối Vuông với Hình Mặt Trời Ria Mép
+-- Giao diện: Menu Trắng-Đen Sang Trọng, Thu Nhỏ Thành Khối Vuông Đen, Hiệu ứng Mượt
 
 local Player = game:GetService("Players").LocalPlayer
 local Mouse = Player:GetMouse()
@@ -44,70 +44,46 @@ KUROHUB.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = KUROHUB
-MainFrame.BackgroundColor3 = Color3.new(0.08, 0.08, 0.08)
-MainFrame.BackgroundTransparency = 0.2
+MainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+MainFrame.BackgroundTransparency = 0.3
 MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
 MainFrame.Size = UDim2.new(0, 320, 0, 420)
-MainFrame.ClipsDescendants = false
-MainFrame.ZIndex = 1
+MainFrame.ClipsDescendants = true
 
 local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 12)
 UICorner.Parent = MainFrame
 
 local UIStroke = Instance.new("UIStroke")
-UIStroke.Color = Color3.new(0, 0.75, 1)
+UIStroke.Color = Color3.new(0.8, 0.8, 0.8)
 UIStroke.Thickness = 2
 UIStroke.Transparency = 0.2
 UIStroke.Parent = MainFrame
-
-local UIGradient = Instance.new("UIGradient")
-UIGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)),
-    ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0, 0))
-}
-UIGradient.Rotation = 45
-UIGradient.Parent = MainFrame
 
 local TitleBar = Instance.new("Frame")
 TitleBar.Size = UDim2.new(1, 0, 0, 40)
 TitleBar.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 TitleBar.BackgroundTransparency = 0.4
 TitleBar.Parent = MainFrame
-TitleBar.ZIndex = 2
-
-local LogoLabel = Instance.new("TextLabel")
-LogoLabel.Text = "KUROHUB"
-LogoLabel.TextColor3 = Color3.new(0, 0.75, 1)
-LogoLabel.TextScaled = true
-LogoLabel.Size = UDim2.new(0.3, 0, 0.8, 0)
-LogoLabel.Position = UDim2.new(0.05, 0, 0.1, 0)
-LogoLabel.BackgroundTransparency = 1
-LogoLabel.Font = Enum.Font.SourceSansPro
-LogoLabel.Parent = TitleBar
-LogoLabel.ZIndex = 3
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Text = "v2.0 | " .. GAME_NAME
+TitleLabel.Text = "KUROHUB v2.2 | " .. GAME_NAME
 TitleLabel.TextColor3 = Color3.new(1, 1, 1)
 TitleLabel.TextScaled = true
-TitleLabel.Size = UDim2.new(0.4, 0, 0.6, 0)
-TitleLabel.Position = UDim2.new(0.35, 0, 0.2, 0)
+TitleLabel.Size = UDim2.new(0.6, 0, 1, 0)
+TitleLabel.Position = UDim2.new(0.05, 0, 0, 0)
 TitleLabel.BackgroundTransparency = 1
-TitleLabel.Font = Enum.Font.SourceSansPro
+TitleLabel.Font = Enum.Font.GothamBold
 TitleLabel.Parent = TitleBar
-TitleLabel.ZIndex = 3
 
 local CloseButton = Instance.new("TextButton")
 CloseButton.Text = "X"
 CloseButton.TextColor3 = Color3.new(1, 1, 1)
-CloseButton.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+CloseButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 CloseButton.Size = UDim2.new(0, 30, 0, 30)
 CloseButton.Position = UDim2.new(1, -35, 0, 5)
 CloseButton.TextScaled = true
-CloseButton.Font = Enum.Font.SourceSansPro
 CloseButton.Parent = TitleBar
-CloseButton.ZIndex = 3
 CloseButton.MouseButton1Click:Connect(function()
     KUROHUB.Enabled = false
 end)
@@ -119,35 +95,34 @@ UICornerClose.Parent = CloseButton
 local MinimizeButton = Instance.new("TextButton")
 MinimizeButton.Text = "-"
 MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
-MinimizeButton.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+MinimizeButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
 MinimizeButton.Position = UDim2.new(1, -70, 0, 5)
 MinimizeButton.TextScaled = true
-MinimizeButton.Font = Enum.Font.SourceSansPro
 MinimizeButton.Parent = TitleBar
-MinimizeButton.ZIndex = 3
 
 local UICornerMinimize = Instance.new("UICorner")
 UICornerMinimize.CornerRadius = UDim.new(0, 8)
 UICornerMinimize.Parent = MinimizeButton
 
--- Khối vuông khi thu nhỏ (với hình mặt trời ria mép)
-local MinimizedSquare = Instance.new("ImageButton")
+-- Khối vuông khi thu nhỏ
+local MinimizedSquare = Instance.new("TextButton")
 MinimizedSquare.Size = UDim2.new(0, 50, 0, 50)
-MinimizedSquare.BackgroundColor3 = Color3.new(0.08, 0.08, 0.08)
-MinimizedSquare.BackgroundTransparency = 0.2
-MinimizedSquare.Image = "rbxassetid://[THAY_ID_HINH_ANH_VAO_DAY]" -- Thay ID hình ảnh mặt trời với ria mép vào đây
-MinimizedSquare.ImageTransparency = 0
+MinimizedSquare.BackgroundColor3 = Color3.new(0, 0, 0)
+MinimizedSquare.BackgroundTransparency = 0.3
+MinimizedSquare.Text = "+"
+MinimizedSquare.TextColor3 = Color3.new(1, 1, 1)
+MinimizedSquare.TextScaled = true
+MinimizedSquare.Font = Enum.Font.GothamBold
 MinimizedSquare.Visible = false
 MinimizedSquare.Parent = KUROHUB
-MinimizedSquare.ZIndex = 1
 
 local SquareUICorner = Instance.new("UICorner")
 SquareUICorner.CornerRadius = UDim.new(0, 12)
 SquareUICorner.Parent = MinimizedSquare
 
 local SquareUIStroke = Instance.new("UIStroke")
-SquareUIStroke.Color = Color3.new(0, 0.75, 1)
+SquareUIStroke.Color = Color3.new(0.8, 0.8, 0.8)
 SquareUIStroke.Thickness = 2
 SquareUIStroke.Transparency = 0.2
 SquareUIStroke.Parent = MinimizedSquare
@@ -191,24 +166,30 @@ local function ToggleMinimize()
     isMinimized = not isMinimized
     
     if isMinimized then
-        local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        TweenService:Create(MainFrame, tweenInfo, {Size = UDim2.new(0, 50, 0, 50), Rotation = 5}):Play()
-        wait(0.4)
+        -- Thu nhỏ thành khối vuông
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        TweenService:Create(MainFrame, tweenInfo, {Size = UDim2.new(0, 50, 0, 50)}):Play()
+        TweenService:Create(MainFrame, tweenInfo, {Position = MainFrame.Position}):Play() -- Giữ vị trí
+        wait(0.3)
         MainFrame.Visible = false
         MinimizedSquare.Position = MainFrame.Position
         MinimizedSquare.Visible = true
-        MinimizedSquare.Rotation = 5
-        TweenService:Create(MinimizedSquare, tweenInfo, {Rotation = 0}):Play()
         MinimizeButton.Text = "+"
+        for _, child in pairs(MainFrame:GetChildren()) do
+            child.Visible = false
+        end
     else
-        local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        -- Mở lại menu
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         MainFrame.Visible = true
         MainFrame.Position = MinimizedSquare.Position
-        MainFrame.Rotation = 5
-        TweenService:Create(MainFrame, tweenInfo, {Size = UDim2.new(0, 320, 0, 420), Rotation = 0}):Play()
-        wait(0.4)
+        TweenService:Create(MainFrame, tweenInfo, {Size = UDim2.new(0, 320, 0, 420)}):Play()
+        wait(0.3)
         MinimizedSquare.Visible = false
         MinimizeButton.Text = "-"
+        for _, child in pairs(MainFrame:GetChildren()) do
+            child.Visible = true
+        end
     end
 end
 
@@ -220,46 +201,38 @@ local TabFrame = Instance.new("Frame")
 TabFrame.Size = UDim2.new(1, -10, 0, 35)
 TabFrame.Position = UDim2.new(0, 5, 0, 45)
 TabFrame.BackgroundTransparency = 0.6
-TabFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+TabFrame.BackgroundColor3 = Color3.new(0.05, 0.05, 0.05)
 TabFrame.Parent = MainFrame
-TabFrame.ZIndex = 3
 
 local ContentFrame = Instance.new("Frame")
 ContentFrame.Size = UDim2.new(1, -10, 1, -120)
 ContentFrame.Position = UDim2.new(0, 5, 0, 85)
 ContentFrame.BackgroundTransparency = 1
+ContentFrame.ClipsDescendants = true
 ContentFrame.Parent = MainFrame
-ContentFrame.ZIndex = 4
 
 local StatusBar = Instance.new("TextLabel")
 StatusBar.Text = "FPS: -- | Mục tiêu: 0 | Rủi ro: An Toàn"
-StatusBar.TextColor3 = Color3.new(0, 0.75, 1)
+StatusBar.TextColor3 = Color3.new(1, 1, 1)
 StatusBar.BackgroundTransparency = 0.7
 StatusBar.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 StatusBar.Size = UDim2.new(1, -10, 0, 25)
 StatusBar.Position = UDim2.new(0, 5, 1, -30)
 StatusBar.TextScaled = true
-StatusBar.Font = Enum.Font.SourceSansPro
+StatusBar.Font = Enum.Font.Gotham
 StatusBar.Parent = MainFrame
-StatusBar.ZIndex = 5
-
-local StatusUICorner = Instance.new("UICorner")
-StatusUICorner.CornerRadius = UDim.new(0, 6)
-StatusUICorner.Parent = StatusBar
 
 -- Thanh tiến trình Anti-Ban
 local ProtectionBarFrame = Instance.new("Frame")
 ProtectionBarFrame.Size = UDim2.new(0.9, 0, 0, 15)
 ProtectionBarFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
-ProtectionBarFrame.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+ProtectionBarFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 ProtectionBarFrame.Parent = nil
-ProtectionBarFrame.ZIndex = 5
 
 local ProtectionBarFill = Instance.new("Frame")
 ProtectionBarFill.Size = UDim2.new(0, 0, 1, 0)
-ProtectionBarFill.BackgroundColor3 = Color3.new(0, 0.75, 1)
+ProtectionBarFill.BackgroundColor3 = Color3.new(1, 1, 1)
 ProtectionBarFill.Parent = ProtectionBarFrame
-ProtectionBarFill.ZIndex = 6
 
 local UICornerProtection = Instance.new("UICorner")
 UICornerProtection.CornerRadius = UDim.new(0, 4)
@@ -276,9 +249,8 @@ ProtectionLabel.Size = UDim2.new(0.9, 0, 0, 20)
 ProtectionLabel.Position = UDim2.new(0.05, 0, 0.15, 0)
 ProtectionLabel.BackgroundTransparency = 1
 ProtectionLabel.TextScaled = true
-ProtectionLabel.Font = Enum.Font.SourceSansPro
+ProtectionLabel.Font = Enum.Font.Gotham
 ProtectionLabel.Parent = nil
-ProtectionLabel.ZIndex = 5
 
 -- Cài đặt
 local Settings = {
@@ -298,6 +270,8 @@ local Settings = {
     WeaponMode = "Sword",
     AttackRange = WEAPON_RANGES.Sword,
     HitboxColor = "Red",
+    DynamicHitbox = true,
+    HitboxParticles = false,
     AntiBanLevel = "Chiến Thần Vô Hạn",
     FakeBanRisk = 0,
     ProtectionProgress = 0
@@ -514,6 +488,9 @@ local function ExpandHitbox()
                         end
                     end
                 end
+                if v.Character:FindFirstChild("KURO_Particles") then
+                    v.Character.KURO_Particles:Destroy()
+                end
             end
         end
         HitboxCache = {}
@@ -523,7 +500,9 @@ local function ExpandHitbox()
     for _, v in pairs(game.Players:GetPlayers()) do
         if v ~= Player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
             if Settings.TeamFilter and v.Team == Player.Team then continue end
+            local Distance = (v.Character.HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude
             local RandomSize = Settings.HitboxSize * (Settings.AntiBan and math.random(95, 105) / 100 or 1)
+            local DynamicSize = Settings.DynamicHitbox and math.clamp(RandomSize * (1 + (60 - Distance) / 20), RandomSize, RandomSize * 2) or RandomSize
             
             for partName, Multiplier in pairs(HITBOX_PARTS) do
                 local part = v.Character:FindFirstChild(partName)
@@ -538,8 +517,20 @@ local function ExpandHitbox()
                         SizeTag.Parent = part
                         HitboxCache[v.UserId .. partName] = true
                     end
-                    part.Size = part:FindFirstChild("KURO_OriginalSize").Value * RandomSize * Multiplier
+                    part.Size = part:FindFirstChild("KURO_OriginalSize").Value * DynamicSize * Multiplier
                 end
+            end
+            
+            if Settings.HitboxParticles and not v.Character:FindFirstChild("KURO_Particles") then
+                local ParticleEmitter = Instance.new("ParticleEmitter")
+                ParticleEmitter.Name = "KURO_Particles"
+                ParticleEmitter.Texture = "rbxassetid://243098098"
+                ParticleEmitter.Size = NumberSequence.new(0.3)
+                ParticleEmitter.Transparency = NumberSequence.new(0.6)
+                ParticleEmitter.Lifetime = NumberRange.new(0.4, 0.8)
+                ParticleEmitter.Rate = 8
+                ParticleEmitter.Color = ColorSequence.new(HITBOX_COLORS[Settings.HitboxColor])
+                ParticleEmitter.Parent = v.Character.HumanoidRootPart
             end
         end
     end
@@ -610,38 +601,37 @@ local function CreateButton(Text, YPos, Setting, Parent, Callback)
     Button.Size = UDim2.new(0.9, 0, 0, 30)
     Button.Text = Text .. ": " .. (Settings[Setting] and "BẬT" or "TẮT")
     Button.TextColor3 = Color3.new(1, 1, 1)
-    Button.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+    Button.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
     Button.BackgroundTransparency = 0.5
     Button.BorderSizePixel = 0
     Button.TextScaled = true
-    Button.Font = Enum.Font.SourceSansPro
+    Button.Font = Enum.Font.Gotham
     Button.Parent = Parent
-    Button.ZIndex = 5
     
     local UICornerBtn = Instance.new("UICorner")
     UICornerBtn.CornerRadius = UDim.new(0, 8)
     UICornerBtn.Parent = Button
     
     local UIStrokeBtn = Instance.new("UIStroke")
-    UIStrokeBtn.Color = Color3.new(0, 0.75, 1)
+    UIStrokeBtn.Color = Color3.new(0.8, 0.8, 0.8)
     UIStrokeBtn.Thickness = 1
     UIStrokeBtn.Transparency = 0.5
     UIStrokeBtn.Parent = Button
     
     Button.MouseEnter:Connect(function()
-        TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.new(0, 0.75, 1), BackgroundTransparency = 0.3}):Play()
-        TweenService:Create(UIStrokeBtn, TweenInfo.new(0.3), {Transparency = 0}):Play()
+        TweenService:Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.new(0.4, 0.4, 0.4), BackgroundTransparency = 0.3}):Play()
+        TweenService:Create(UIStrokeBtn, TweenInfo.new(0.2), {Transparency = 0}):Play()
     end)
     Button.MouseLeave:Connect(function()
-        TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Settings[Setting] and Color3.new(0, 0.5, 0.8) or Color3.new(0.15, 0.15, 0.15), BackgroundTransparency = 0.5}):Play()
-        TweenService:Create(UIStrokeBtn, TweenInfo.new(0.3), {Transparency = 0.5}):Play()
+        TweenService:Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = Settings[Setting] and Color3.new(0.3, 0.3, 0.3) or Color3.new(0.2, 0.2, 0.2), BackgroundTransparency = 0.5}):Play()
+        TweenService:Create(UIStrokeBtn, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
     end)
     
     Button.MouseButton1Click:Connect(function()
         SoundService:PlayLocalSound(ClickSound)
         Settings[Setting] = not Settings[Setting]
         Button.Text = Text .. ": " .. (Settings[Setting] and "BẬT" or "TẮT")
-        Button.BackgroundColor3 = Settings[Setting] and Color3.new(0, 0.5, 0.8) or Color3.new(0.15, 0.15, 0.15)
+        Button.BackgroundColor3 = Settings[Setting] and Color3.new(0.3, 0.3, 0.3) or Color3.new(0.2, 0.2, 0.2)
         SaveSettings()
         if Callback then
             Callback()
@@ -656,7 +646,6 @@ local function CreateSlider(Text, YPos, Min, Max, Default, Setting, Parent)
     SliderFrame.Size = UDim2.new(0.9, 0, 0, 45)
     SliderFrame.BackgroundTransparency = 1
     SliderFrame.Parent = Parent
-    SliderFrame.ZIndex = 5
     
     local Label = Instance.new("TextLabel")
     Label.Text = Text .. ": " .. Settings[Setting]
@@ -664,27 +653,24 @@ local function CreateSlider(Text, YPos, Min, Max, Default, Setting, Parent)
     Label.Size = UDim2.new(1, 0, 0, 20)
     Label.BackgroundTransparency = 1
     Label.TextScaled = true
-    Label.Font = Enum.Font.SourceSansPro
+    Label.Font = Enum.Font.Gotham
     Label.Parent = SliderFrame
-    Label.ZIndex = 6
     
     local Slider = Instance.new("TextButton")
     Slider.Text = ""
-    Slider.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+    Slider.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
     Slider.Size = UDim2.new(1, 0, 0, 8)
     Slider.Position = UDim2.new(0, 0, 0, 25)
     Slider.Parent = SliderFrame
-    Slider.ZIndex = 6
     
     local UICornerSlider = Instance.new("UICorner")
     UICornerSlider.CornerRadius = UDim.new(0, 4)
     UICornerSlider.Parent = Slider
     
     local Fill = Instance.new("Frame")
-    Fill.BackgroundColor3 = Color3.new(0, 0.75, 1)
+    Fill.BackgroundColor3 = Color3.new(1, 1, 1)
     Fill.Size = UDim2.new((Settings[Setting] - Min) / (Max - Min), 0, 1, 0)
     Fill.Parent = Slider
-    Fill.ZIndex = 7
     
     local UICornerFill = Instance.new("UICorner")
     UICornerFill.CornerRadius = UDim.new(0, 4)
@@ -717,19 +703,18 @@ local function CreateDropdown(Text, YPos, Options, Setting, Parent, Callback)
     Dropdown.Position = UDim2.new(0.05, 0, YPos, 0)
     Dropdown.Size = UDim2.new(0.9, 0, 0, 30)
     Dropdown.TextColor3 = Color3.new(1, 1, 1)
-    Dropdown.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+    Dropdown.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
     Dropdown.BackgroundTransparency = 0.5
     Dropdown.TextScaled = true
-    Dropdown.Font = Enum.Font.SourceSansPro
+    Dropdown.Font = Enum.Font.Gotham
     Dropdown.Parent = Parent
-    Dropdown.ZIndex = 5
     
     local UICornerBtn = Instance.new("UICorner")
     UICornerBtn.CornerRadius = UDim.new(0, 8)
     UICornerBtn.Parent = Dropdown
     
     local UIStrokeBtn = Instance.new("UIStroke")
-    UIStrokeBtn.Color = Color3.new(0, 0.75, 1)
+    UIStrokeBtn.Color = Color3.new(0.8, 0.8, 0.8)
     UIStrokeBtn.Thickness = 1
     UIStrokeBtn.Transparency = 0.5
     UIStrokeBtn.Parent = Dropdown
@@ -741,7 +726,6 @@ local function CreateDropdown(Text, YPos, Options, Setting, Parent, Callback)
     OptionFrame.BackgroundTransparency = 0.5
     OptionFrame.Visible = false
     OptionFrame.Parent = Dropdown
-    OptionFrame.ZIndex = 6
     
     local UICornerOption = Instance.new("UICorner")
     UICornerOption.CornerRadius = UDim.new(0, 8)
@@ -755,9 +739,8 @@ local function CreateDropdown(Text, YPos, Options, Setting, Parent, Callback)
         OptionBtn.TextColor3 = Color3.new(1, 1, 1)
         OptionBtn.BackgroundTransparency = 0.7
         OptionBtn.TextScaled = true
-        OptionBtn.Font = Enum.Font.SourceSansPro
+        OptionBtn.Font = Enum.Font.Gotham
         OptionBtn.Parent = OptionFrame
-        OptionBtn.ZIndex = 7
         OptionBtn.MouseButton1Click:Connect(function()
             SoundService:PlayLocalSound(ClickSound)
             Settings[Setting] = option
@@ -789,7 +772,6 @@ for _, tab in pairs(Tabs) do
     tab.BackgroundTransparency = 1
     tab.Visible = false
     tab.Parent = ContentFrame
-    tab.ZIndex = 4
 end
 Tabs.Aim.Visible = true
 
@@ -800,31 +782,21 @@ local function CreateTabButton(Text, XPos, Tab)
     Button.Size = UDim2.new(0.25, -2, 1, -5)
     Button.Position = UDim2.new(XPos, 0, 0, 3)
     Button.TextColor3 = Color3.new(1, 1, 1)
-    Button.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+    Button.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
     Button.BackgroundTransparency = 0.5
     Button.TextScaled = true
-    Button.Font = Enum.Font.SourceSansPro
+    Button.Font = Enum.Font.Gotham
     Button.Parent = TabFrame
-    Button.ZIndex = 4
     
     local UICornerBtn = Instance.new("UICorner")
     UICornerBtn.CornerRadius = UDim.new(0, 8)
     UICornerBtn.Parent = Button
     
-    local UIStrokeBtn = Instance.new("UIStroke")
-    UIStrokeBtn.Color = Color3.new(0, 0.75, 1)
-    UIStrokeBtn.Thickness = 1
-    UIStrokeBtn.Transparency = 0.5
-    UIStrokeBtn.Parent = Button
-    UIStrokeBtn.Name = "UIStroke"
-    
     Button.MouseEnter:Connect(function()
-        TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.new(0, 0.75, 1), BackgroundTransparency = 0.3}):Play()
-        TweenService:Create(UIStrokeBtn, TweenInfo.new(0.3), {Transparency = 0}):Play()
+        TweenService:Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.new(0.4, 0.4, 0.4), BackgroundTransparency = 0.3}):Play()
     end)
     Button.MouseLeave:Connect(function()
-        TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Tabs[Tab].Visible and Color3.new(0, 0.5, 0.8) or Color3.new(0.15, 0.15, 0.15), BackgroundTransparency = 0.5}):Play()
-        TweenService:Create(UIStrokeBtn, TweenInfo.new(0.3), {Transparency = 0.5}):Play()
+        TweenService:Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = Tabs[Tab].Visible and Color3.new(0.3, 0.3, 0.3) or Color3.new(0.2, 0.2, 0.2), BackgroundTransparency = 0.5}):Play()
     end)
     
     Button.MouseButton1Click:Connect(function()
@@ -834,11 +806,9 @@ local function CreateTabButton(Text, XPos, Tab)
         end
         Tabs[Tab].Visible = true
         for _, b in pairs(TabButtons) do
-            b.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
-            b:FindFirstChild("UIStroke").Transparency = 0.5
+            b.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
         end
-        Button.BackgroundColor3 = Color3.new(0, 0.5, 0.8)
-        Button:FindFirstChild("UIStroke").Transparency = 0
+        Button.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
     end)
     table.insert(TabButtons, Button)
 end
@@ -866,131 +836,4 @@ CreateSlider("Tầm ngắm", 0.55, 20, 200, DEFAULT_AIM_RADIUS, "AimRadius", Tab
 CreateSlider("Độ mượt ngắm", 0.7, 0.03, 0.15, DEFAULT_SMOOTHNESS, "AimSmoothness", Tabs.Aim)
 
 CreateButton("Mở rộng Hitbox [R]", 0.05, "ExpandHitbox", Tabs.Hitbox)
-CreateSlider("Kích thước Hitbox", 0.15, 1, 4, DEFAULT_HITBOX_SIZE, "HitboxSize", Tabs.Hitbox)
-
-CreateButton("Hiển thị Hitbox [T]", 0.05, "ShowHitbox", Tabs.Visuals, function()
-    if Settings.ShowHitbox then
-        coroutine.wrap(ShowHitbox)()
-    end
-end)
-CreateButton("Hiển thị phạm vi [Y]", 0.15, "ShowAttackRange", Tabs.Visuals, function()
-    if Settings.ShowAttackRange then
-        coroutine.wrap(ShowAttackRange)()
-    end
-end)
-CreateDropdown("Loại vũ khí", 0.25, {"Kiếm", "Giáo", "Cung"}, "WeaponMode", Tabs.Visuals, function(option)
-    if option == "Kiếm" then
-        Settings.WeaponMode = "Sword"
-        Settings.AttackRange = WEAPON_RANGES.Sword
-    elseif option == "Giáo" then
-        Settings.WeaponMode = "Spear"
-        Settings.AttackRange = WEAPON_RANGES.Spear
-    elseif option == "Cung" then
-        Settings.WeaponMode = "Bow"
-        Settings.AttackRange = WEAPON_RANGES.Bow
-    end
-end)
-CreateDropdown("Màu Hitbox", 0.35, {"Đỏ", "Xanh", "Tím"}, "HitboxColor", Tabs.Visuals, function(option)
-    if option == "Đỏ" then
-        Settings.HitboxColor = "Red"
-    elseif option == "Xanh" then
-        Settings.HitboxColor = "Blue"
-    elseif option == "Tím" then
-        Settings.HitboxColor = "Purple"
-    end
-end)
-
-CreateButton("Anti-Ban Siêu Tinh Vi", 0.05, "AntiBan", Tabs.AntiBan, function()
-    if Settings.AntiBan then
-        AntiBanModule.SimulateProtection()
-        coroutine.wrap(AntiBanModule.SimulatePeriodicCheck)()
-        coroutine.wrap(AntiBanModule.SimulatePacketObfuscation)()
-        ProtectionBarFrame.Parent = Tabs.AntiBan
-        ProtectionLabel.Parent = Tabs.AntiBan
-    else
-        AntiBanModule.Active = false
-        AntiBanModule.Log("Anti-Ban tắt.")
-        ProtectionBarFrame.Parent = nil
-        ProtectionLabel.Parent = nil
-        Settings.ProtectionProgress = 0
-    end
-end)
-local RiskLabel = Instance.new("TextLabel")
-RiskLabel.Text = "Rủi ro ban giả: " .. Settings.FakeBanRisk .. "% (" .. AntiBanModule.RiskLevel .. ")"
-RiskLabel.TextColor3 = Color3.new(1, 1, 1)
-RiskLabel.Size = UDim2.new(0.9, 0, 0, 25)
-RiskLabel.Position = UDim2.new(0.05, 0, 0.35, 0)
-RiskLabel.BackgroundTransparency = 1
-RiskLabel.TextScaled = true
-RiskLabel.Font = Enum.Font.SourceSansPro
-RiskLabel.Parent = Tabs.AntiBan
-RiskLabel.ZIndex = 5
-
--- Kiểm tra an toàn
-local function Initialize()
-    if not Player.Character or not Player.Character:FindFirstChild("HumanoidRootPart") then
-        warn("[KUROHUB] Đợi nhân vật trong " .. GAME_NAME .. "...")
-        Player.CharacterAdded:Wait()
-    end
-    if not game:IsLoaded() then
-        game.Loaded:Wait()
-    end
-    LoadSettings()
-    AntiBanModule.Log("KUROHUB v2.0 khởi tạo cho " .. GAME_NAME .. ".")
-end
-
--- Vòng lặp chính
-local frameCount = 0
-RunService.RenderStepped:Connect(function(delta)
-    frameCount = frameCount + 1
-    if frameCount % 2 == 0 then
-        pcall(SilentAim)
-        pcall(ExpandHitbox)
-    end
-    RiskLabel.Text = "Rủi ro ban giả: " .. Settings.FakeBanRisk .. "% (" .. AntiBanModule.RiskLevel .. ")"
-    ProtectionLabel.Text = "Bypass: " .. Settings.ProtectionProgress .. "%"
-    ProtectionBarFill.Size = UDim2.new(Settings.ProtectionProgress / 100, 0, 1, 0)
-end)
-
--- Dọn dẹp
-Player.AncestryChanged:Connect(function()
-    if not Player:IsDescendantOf(game) then
-        KUROHUB:Destroy()
-        FOVCircle:Destroy()
-    end
-end)
-
--- Phím tắt
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Settings.AimKey then
-        Settings.SilentAim = not Settings.SilentAim
-        SaveSettings()
-        AntiBanModule.Log("Silent Aim: " .. (Settings.SilentAim and "BẬT" or "TẮT"))
-    elseif input.KeyCode == Enum.KeyCode.E then
-        Settings.ShowFOV = not Settings.ShowFOV
-        SaveSettings()
-    elseif input.KeyCode == Enum.KeyCode.R then
-        Settings.ExpandHitbox = not Settings.ExpandHitbox
-        SaveSettings()
-    elseif input.KeyCode == Enum.KeyCode.T then
-        Settings.ShowHitbox = not Settings.ShowHitbox
-        SaveSettings()
-        if Settings.ShowHitbox then
-            coroutine.wrap(ShowHitbox)()
-        end
-    elseif input.KeyCode == Enum.KeyCode.Y then
-        Settings.ShowAttackRange = not Settings.ShowAttackRange
-        SaveSettings()
-        if Settings.ShowAttackRange then
-            coroutine.wrap(ShowAttackRange)()
-        end
-    elseif input.KeyCode == Enum.KeyCode.H then
-        KUROHUB.Enabled = not KUROHUB.Enabled
-    elseif input.KeyCode == Enum.KeyCode.M then
-        ToggleMinimize()
-    end
-end)
-
--- Khởi tạo
-Initialize()
+CreateButton("Hitbox động", 0.15, "Dynamic
