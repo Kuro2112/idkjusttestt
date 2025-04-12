@@ -1,5 +1,5 @@
--- KUROHUB v2.0 (Tối ưu cho APEX-3-DUEL-Warriors)
--- Tính năng: Silent Aim Siêu Cấp, Mở Rộng Hitbox Cực Đại, Show Hitbox Sửa Lỗi, Anti-Ban (Giả Lập)
+-- KUROHUB v2.1 (Tối ưu cho APEX-3-DUEL-Warriors)
+-- Tính năng: Silent Aim Siêu Cấp, Mở Rộng Hitbox Cực Đại, Show Hitbox Sửa Lỗi, Anti-Ban Siêu Tinh Vi (Giả Lập)
 -- Giao diện: Menu Trắng-Đen Sang Trọng, Thu Nhỏ/Phóng To, Hiệu ứng Mượt
 
 local Player = game:GetService("Players").LocalPlayer
@@ -67,7 +67,7 @@ TitleBar.BackgroundTransparency = 0.4
 TitleBar.Parent = MainFrame
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Text = "KUROHUB v2.0 | " .. GAME_NAME
+TitleLabel.Text = "KUROHUB v2.1 | " .. GAME_NAME
 TitleLabel.TextColor3 = Color3.new(1, 1, 1)
 TitleLabel.TextScaled = true
 TitleLabel.Size = UDim2.new(0.6, 0, 1, 0)
@@ -179,6 +179,36 @@ StatusBar.TextScaled = true
 StatusBar.Font = Enum.Font.Gotham
 StatusBar.Parent = MainFrame
 
+-- Thanh tiến trình Anti-Ban
+local ProtectionBarFrame = Instance.new("Frame")
+ProtectionBarFrame.Size = UDim2.new(0.9, 0, 0, 15)
+ProtectionBarFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
+ProtectionBarFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+ProtectionBarFrame.Parent = nil -- Sẽ gắn vào tab AntiBan sau
+
+local ProtectionBarFill = Instance.new("Frame")
+ProtectionBarFill.Size = UDim2.new(0, 0, 1, 0)
+ProtectionBarFill.BackgroundColor3 = Color3.new(1, 1, 1)
+ProtectionBarFill.Parent = ProtectionBarFrame
+
+local UICornerProtection = Instance.new("UICorner")
+UICornerProtection.CornerRadius = UDim.new(0, 4)
+UICornerProtection.Parent = ProtectionBarFrame
+
+local UICornerProtectionFill = Instance.new("UICorner")
+UICornerProtectionFill.CornerRadius = UDim.new(0, 4)
+UICornerProtectionFill.Parent = ProtectionBarFill
+
+local ProtectionLabel = Instance.new("TextLabel")
+ProtectionLabel.Text = "Bypass: 0%"
+ProtectionLabel.TextColor3 = Color3.new(1, 1, 1)
+ProtectionLabel.Size = UDim2.new(0.9, 0, 0, 20)
+ProtectionLabel.Position = UDim2.new(0.05, 0, 0.15, 0)
+ProtectionLabel.BackgroundTransparency = 1
+ProtectionLabel.TextScaled = true
+ProtectionLabel.Font = Enum.Font.Gotham
+ProtectionLabel.Parent = nil -- Sẽ gắn sau
+
 -- Cài đặt
 local Settings = {
     SilentAim = false,
@@ -199,8 +229,9 @@ local Settings = {
     HitboxColor = "Red",
     DynamicHitbox = true,
     HitboxParticles = false,
-    AntiBanLevel = "Chiến Binh Tối Thượng",
-    FakeBanRisk = 0
+    AntiBanLevel = "Chiến Thần Vô Hạn",
+    FakeBanRisk = 0,
+    ProtectionProgress = 0
 }
 
 -- Lưu/Gọi cài đặt
@@ -256,42 +287,83 @@ FOVImage.ImageColor3 = Color3.new(1, 0, 0)
 FOVImage.ImageTransparency = 0.7
 FOVImage.Parent = FOVFrame
 
--- Anti-Ban giả lập
+-- Anti-Ban Siêu Tinh Vi (Giả Lập)
 local AntiBanModule = {
     Active = false,
     FakeTelemetry = {},
+    RiskLevel = "An Toàn",
     Log = function(message)
         warn("[KUROHUB Anti-Ban | " .. GAME_NAME .. "]: " .. message)
     end,
     SimulateProtection = function()
         if not Settings.AntiBan then return end
         AntiBanModule.Active = true
-        AntiBanModule.Log("Khởi tạo Anti-Ban v2.7 cho " .. GAME_NAME)
+        AntiBanModule.Log("Khởi tạo Anti-Ban Siêu Tinh Vi v3.0 cho " .. GAME_NAME)
         AntiBanModule.FakeTelemetry = {
             SessionID = HttpService:GenerateGUID(false),
             Timestamp = os.time(),
             FakeChecksum = math.random(1000000, 9999999),
-            FakeWarriorKey = "WRLR-TỐI-THƯỢNG-" .. math.random(10000, 99999),
-            FakePing = math.random(10, 70)
+            FakeWarriorKey = "WRLR-CHIẾN-THẦN-" .. HttpService:GenerateGUID(false):sub(1, 8),
+            FakePing = math.random(5, 50),
+            FakePacketHash = tostring(math.random(100000, 999999)) .. "-" .. math.random(1000, 9999),
+            FakeBehaviorScore = math.random(80, 95),
+            FakeServerKey = "SRV-" .. HttpService:GenerateGUID(false):sub(1, 12)
         }
         AntiBanModule.Log("ID phiên: " .. AntiBanModule.FakeTelemetry.SessionID)
         AntiBanModule.Log("Cấp bảo vệ: " .. Settings.AntiBanLevel)
-        AntiBanModule.Log("Ping server: " .. AntiBanModule.FakeTelemetry.FakePing .. "ms")
-        wait(0.3)
-        AntiBanModule.Log("Kiểm tra mã: " .. AntiBanModule.FakeTelemetry.FakeChecksum)
-        AntiBanModule.Log("Khóa chiến binh: " .. AntiBanModule.FakeTelemetry.FakeWarriorKey)
-        AntiBanModule.Log("Anti-Ban kích hoạt (giả lập, không bảo vệ thật).")
+        AntiBanModule.Log("Ping giả lập: " .. AntiBanModule.FakeTelemetry.FakePing .. "ms")
+        AntiBanModule.Log("Mã gói tin: " .. AntiBanModule.FakeTelemetry.FakePacketHash)
+        AntiBanModule.Log("Điểm hành vi: " .. AntiBanModule.FakeTelemetry.FakeBehaviorScore .. "/100")
+        wait(0.5)
+        AntiBanModule.Log("Mã xác thực server: " .. AntiBanModule.FakeTelemetry.FakeServerKey)
+        AntiBanModule.Log("Mô phỏng mã hóa dữ liệu client...")
+        AntiBanModule.Log("Anti-Ban Siêu Tinh Vi kích hoạt (GIẢ LẬP, KHÔNG BẢO VỆ THẬT).")
     end,
     SimulatePeriodicCheck = function()
-        while Settings.AntiBan and wait(math.random(3, 6)) do
-            AntiBanModule.Log("Mô phỏng né chống gian lận " .. GAME_NAME .. "...")
+        while Settings.AntiBan and wait(math.random(2, 5)) do
             AntiBanModule.FakeTelemetry.FakeChecksum = math.random(1000000, 9999999)
-            AntiBanModule.FakeTelemetry.FakePing = math.random(10, 70)
-            Settings.FakeBanRisk = math.clamp(Settings.FakeBanRisk + math.random(-15, 20), 0, 100)
-            AntiBanModule.Log("Mã mới: " .. AntiBanModule.FakeTelemetry.FakeChecksum)
+            AntiBanModule.FakeTelemetry.FakePing = math.random(5, 50)
+            AntiBanModule.FakeTelemetry.FakePacketHash = tostring(math.random(100000, 999999)) .. "-" .. math.random(1000, 9999)
+            AntiBanModule.FakeTelemetry.FakeBehaviorScore = math.clamp(AntiBanModule.FakeTelemetry.FakeBehaviorScore + math.random(-5, 5), 70, 98)
+            Settings.FakeBanRisk = math.clamp(Settings.FakeBanRisk + math.random(-10, 15), 0, 90)
+            Settings.ProtectionProgress = math.clamp(Settings.ProtectionProgress + math.random(5, 20), 0, 100)
+            
+            -- Cập nhật cấp rủi ro
+            if Settings.FakeBanRisk < 30 then
+                AntiBanModule.RiskLevel = "An Toàn"
+            elseif Settings.FakeBanRisk < 60 then
+                AntiBanModule.RiskLevel = "Nguy Hiểm"
+            else
+                AntiBanModule.RiskLevel = "Cực Kỳ Nguy Hiểm"
+            end
+            
+            AntiBanModule.Log("Kiểm tra định kỳ: Mã mới: " .. AntiBanModule.FakeTelemetry.FakeChecksum)
             AntiBanModule.Log("Ping: " .. AntiBanModule.FakeTelemetry.FakePing .. "ms")
-            AntiBanModule.Log("Rủi ro ban giả: " .. Settings.FakeBanRisk .. "%")
+            AntiBanModule.Log("Gói tin: " .. AntiBanModule.FakeTelemetry.FakePacketHash)
+            AntiBanModule.Log("Điểm hành vi: " .. AntiBanModule.FakeTelemetry.FakeBehaviorScore .. "/100")
+            AntiBanModule.Log("Rủi ro ban giả: " .. Settings.FakeBanRisk .. "% (" .. AntiBanModule.RiskLevel .. ")")
+            AntiBanModule.Log("Tiến trình bypass: " .. Settings.ProtectionProgress .. "%")
+            
+            -- Giả lập né kiểm tra tốc độ
+            if Settings.SilentAim then
+                local randomSmooth = Settings.AimSmoothness * math.random(90, 110) / 100
+                AntiBanModule.Log("Ngụy trang Silent Aim: Độ mượt ngẫu nhiên " .. string.format("%.3f", randomSmooth))
+            end
+            if Settings.ExpandHitbox then
+                local randomSize = Settings.HitboxSize * math.random(95, 105) / 100
+                AntiBanModule.Log("Ngụy trang Hitbox: Kích thước ngẫu nhiên " .. string.format("%.2f", randomSize) .. "x")
+            end
         end
+    end,
+    SimulatePacketObfuscation = function()
+        if not Settings.AntiBan then return end
+        AntiBanModule.Log("Mô phỏng nhiễu gói tin server...")
+        local fakePackets = math.random(3, 8)
+        for i = 1, fakePackets do
+            AntiBanModule.Log("Gửi gói tin giả #" .. i .. ": PKT-" .. HttpService:GenerateGUID(false):sub(1, 6))
+            wait(0.1)
+        end
+        AntiBanModule.Log("Nhiễu hoàn tất, server bị đánh lừa (giả lập).")
     end
 }
 
@@ -347,14 +419,15 @@ local function SilentAim()
         local TargetPart = ClosestPlayer.Character:FindFirstChild("Head") or ClosestPlayer.Character.HumanoidRootPart
         local Velocity = ClosestPlayer.Character.HumanoidRootPart.Velocity
         local PingFactor = AntiBanModule.FakeTelemetry.FakePing and (AntiBanModule.FakeTelemetry.FakePing / 1000) or 0.04
-        local PredictedPos = TargetPart.Position + Velocity * (Settings.AimSmoothness + PingFactor * 1.5)
+        local RandomSmooth = Settings.AimSmoothness * (Settings.AntiBan and math.random(90, 110) / 100 or 1)
+        local PredictedPos = TargetPart.Position + Velocity * (RandomSmooth + PingFactor * 1.5)
         local MousePos = Camera:WorldToViewportPoint(PredictedPos)
-        local DeltaX = (MousePos.X - Mouse.X) * Settings.AimSmoothness
-        local DeltaY = (MousePos.Y - Mouse.Y) * Settings.AimSmoothness
+        local DeltaX = (MousePos.X - Mouse.X) * RandomSmooth
+        local DeltaY = (MousePos.Y - Mouse.Y) * RandomSmooth
         mousemoverel(DeltaX, DeltaY)
     end
     
-    StatusBar.Text = string.format("FPS: %.1f | Mục tiêu: %d | Rủi ro ban: %d%%", 1 / RunService.RenderStepped:Wait(), TargetCount, Settings.FakeBanRisk)
+    StatusBar.Text = string.format("FPS: %.1f | Mục tiêu: %d | Rủi ro: %s", 1 / RunService.RenderStepped:Wait(), TargetCount, AntiBanModule.RiskLevel)
 end
 
 -- Mở Rộng Hitbox Cực Đại
@@ -387,7 +460,8 @@ local function ExpandHitbox()
         if v ~= Player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
             if Settings.TeamFilter and v.Team == Player.Team then continue end
             local Distance = (v.Character.HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude
-            local DynamicSize = Settings.DynamicHitbox and math.clamp(Settings.HitboxSize * (1 + (60 - Distance) / 20), Settings.HitboxSize, Settings.HitboxSize * 2) or Settings.HitboxSize
+            local RandomSize = Settings.HitboxSize * (Settings.AntiBan and math.random(95, 105) / 100 or 1)
+            local DynamicSize = Settings.DynamicHitbox and math.clamp(RandomSize * (1 + (60 - Distance) / 20), RandomSize, RandomSize * 2) or RandomSize
             
             for partName, Multiplier in pairs(HITBOX_PARTS) do
                 local part = v.Character:FindFirstChild(partName)
@@ -423,7 +497,6 @@ end
 
 -- Show Hitbox (Sửa lỗi)
 local function ShowHitbox()
-    -- Xóa Highlight cũ trước khi bắt đầu
     for _, v in pairs(game.Players:GetPlayers()) do
         if v ~= Player and v.Character and v.Character:FindFirstChild("KURO_Highlight") then
             v.Character.KURO_Highlight:Destroy()
@@ -443,17 +516,16 @@ local function ShowHitbox()
                 Highlight.Name = "KURO_Highlight"
                 Highlight.FillColor = HITBOX_COLORS[Settings.HitboxColor]
                 Highlight.OutlineColor = Color3.new(1, 1, 1)
-                Highlight.FillTransparency = 0.4 -- Tăng độ rõ
+                Highlight.FillTransparency = 0.4
                 Highlight.OutlineTransparency = 0
                 Highlight.Adornee = v.Character
                 Highlight.Parent = v.Character
                 Highlight.Enabled = true
             end
         end
-        wait(0.1) -- Giảm tần suất để tối ưu
+        wait(0.1)
     end
     
-    -- Xóa Highlight khi tắt
     for _, v in pairs(game.Players:GetPlayers()) do
         if v ~= Player and v.Character and v.Character:FindFirstChild("KURO_Highlight") then
             v.Character.KURO_Highlight:Destroy()
@@ -759,29 +831,38 @@ CreateDropdown("Màu Hitbox", 0.35, {"Đỏ", "Xanh", "Tím"}, "HitboxColor", Ta
     end
 end)
 
-CreateButton("Anti-Ban", 0.05, "AntiBan", Tabs.AntiBan, function()
+CreateButton("Anti-Ban Siêu Tinh Vi", 0.05, "AntiBan", Tabs.AntiBan, function()
     if Settings.AntiBan then
         AntiBanModule.SimulateProtection()
         coroutine.wrap(AntiBanModule.SimulatePeriodicCheck)()
+        coroutine.wrap(AntiBanModule.SimulatePacketObfuscation)()
+        ProtectionBarFrame.Parent = Tabs.AntiBan
+        ProtectionLabel.Parent = Tabs.AntiBan
     else
         AntiBanModule.Active = false
         AntiBanModule.Log("Anti-Ban tắt.")
+        ProtectionBarFrame.Parent = nil
+        ProtectionLabel.Parent = nil
+        Settings.ProtectionProgress = 0
     end
 end)
 local RiskLabel = Instance.new("TextLabel")
-RiskLabel.Text = "Rủi ro ban giả: " .. Settings.FakeBanRisk .. "%"
+RiskLabel.Text = "Rủi ro ban giả: " .. Settings.FakeBanRisk .. "% (" .. AntiBanModule.RiskLevel .. ")"
 RiskLabel.TextColor3 = Color3.new(1, 1, 1)
 RiskLabel.Size = UDim2.new(0.9, 0, 0, 25)
-RiskLabel.Position = UDim2.new(0.05, 0, 0.15, 0)
+RiskLabel.Position = UDim2.new(0.05, 0, 0.35, 0)
 RiskLabel.BackgroundTransparency = 1
 RiskLabel.TextScaled = true
 RiskLabel.Font = Enum.Font.Gotham
 RiskLabel.Parent = Tabs.AntiBan
 
+ProtectionBarFrame.Parent = Tabs.AntiBan
+ProtectionLabel.Parent = Tabs.AntiBan
+
 -- Cảnh báo
 local WarnLabel = Instance.new("TextLabel")
-WarnLabel.Text = "DÙNG CÓ RỦI RO! ANTI-BAN CHỈ LÀ GIẢ LẬP!"
-WarnLabel.TextColor3 = Color3.new(1, 0.2, 0.2)
+WarnLabel.Text = "CẢNH BÁO: DÙNG SCRIPT NÀY DỄ BỊ BAN VĨNH VIỄN! ANTI-BAN LÀ GIẢ LẬP!"
+WarnLabel.TextColor3 = Color3.new(1, 0, 0)
 WarnLabel.Position = UDim2.new(0.05, 0, 1, -55)
 WarnLabel.Size = UDim2.new(0.9, 0, 0, 25)
 WarnLabel.BackgroundTransparency = 1
@@ -799,7 +880,7 @@ local function Initialize()
         game.Loaded:Wait()
     end
     LoadSettings()
-    AntiBanModule.Log("KUROHUB v2.0 khởi tạo cho " .. GAME_NAME .. ".")
+    AntiBanModule.Log("KUROHUB v2.1 khởi tạo cho " .. GAME_NAME .. ".")
 end
 
 -- Vòng lặp chính
@@ -810,7 +891,9 @@ RunService.RenderStepped:Connect(function(delta)
         pcall(SilentAim)
         pcall(ExpandHitbox)
     end
-    RiskLabel.Text = "Rủi ro ban giả: " .. Settings.FakeBanRisk .. "%"
+    RiskLabel.Text = "Rủi ro ban giả: " .. Settings.FakeBanRisk .. "% (" .. AntiBanModule.RiskLevel .. ")"
+    ProtectionLabel.Text = "Bypass: " .. Settings.ProtectionProgress .. "%"
+    ProtectionBarFill.Size = UDim2.new(Settings.ProtectionProgress / 100, 0, 1, 0)
 end)
 
 -- Dọn dẹp
