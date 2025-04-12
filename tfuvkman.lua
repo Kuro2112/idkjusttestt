@@ -1,4 +1,4 @@
--- KUROHUB v2.5 (Tối ưu cho APEX-3-DUEL-Warriors)
+-- KUROHUB v2.4 (Tối ưu cho APEX-3-DUEL-Warriors)
 -- Tính năng: Silent Aim Siêu Cấp, Mở Rộng Hitbox Cực Đại, Show Hitbox Sửa Lỗi, Anti-Ban Siêu Tinh Vi (Giả Lập)
 -- Giao diện: Phong cách Redz Hub (Neon, Đen/Xám, Hiệu ứng Mượt), Thu Nhỏ Thành Khối Vuông với Hình Mặt Trời Ria Mép
 
@@ -40,13 +40,12 @@ local KUROHUB = Instance.new("ScreenGui")
 KUROHUB.Name = "KUROHUB_" .. HttpService:GenerateGUID(false)
 KUROHUB.Parent = game.CoreGui
 KUROHUB.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-KUROHUB.DisplayOrder = 100 -- Tăng DisplayOrder để đảm bảo giao diện không bị che bởi UI khác
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = KUROHUB
 MainFrame.BackgroundColor3 = Color3.new(0.08, 0.08, 0.08)
-MainFrame.BackgroundTransparency = 0.4 -- Tăng transparency để tránh che phủ
+MainFrame.BackgroundTransparency = 0.2
 MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
 MainFrame.Size = UDim2.new(0, 320, 0, 420)
 MainFrame.ClipsDescendants = false
@@ -89,7 +88,7 @@ LogoLabel.Parent = TitleBar
 LogoLabel.ZIndex = 3
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Text = "v2.5 | " .. GAME_NAME
+TitleLabel.Text = "v2.4 | " .. GAME_NAME
 TitleLabel.TextColor3 = Color3.new(1, 1, 1)
 TitleLabel.TextScaled = true
 TitleLabel.Size = UDim2.new(0.4, 0, 0.6, 0)
@@ -201,12 +200,6 @@ local function ToggleMinimize()
         MinimizedSquare.Rotation = 5
         TweenService:Create(MinimizedSquare, tweenInfo, {Rotation = 0}):Play()
         MinimizeButton.Text = "+"
-        for _, child in pairs(MainFrame:GetChildren()) do
-            if child ~= TitleBar then
-                child.Visible = false
-            end
-        end
-        TitleBar.Visible = false
     else
         local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         MainFrame.Visible = true
@@ -216,10 +209,6 @@ local function ToggleMinimize()
         wait(0.4)
         MinimizedSquare.Visible = false
         MinimizeButton.Text = "-"
-        for _, child in pairs(MainFrame:GetChildren()) do
-            child.Visible = true
-        end
-        TitleBar.Visible = true
     end
 end
 
@@ -968,11 +957,7 @@ local function Initialize()
         game.Loaded:Wait()
     end
     LoadSettings()
-    AntiBanModule.Log("KUROHUB v2.5 khởi tạo cho " .. GAME_NAME .. ".")
-    -- Đảm bảo các thành phần hiển thị ngay từ đầu
-    for _, child in pairs(MainFrame:GetChildren()) do
-        child.Visible = true
-    end
+    AntiBanModule.Log("KUROHUB v2.4 khởi tạo cho " .. GAME_NAME .. ".")
 end
 
 -- Vòng lặp chính
