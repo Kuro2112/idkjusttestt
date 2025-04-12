@@ -1,164 +1,70 @@
--- KUROHUB Script
+-- KUROHUB for APEX-3-DUEL-Warriors
 -- Features: Silent Aim, Expand Hitbox, Show Hitbox, Show Attack Range, Anti-Ban
 -- Library: Orion
 
-local KUROHUB = {}
-KUROHUB.__index = KUROHUB
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "KUROHUB | APEX-3-DUEL-Warriors", HidePremium = false, SaveConfig = true, ConfigFolder = "KUROHUBConfig"})
 
--- Main UI Window
-local window = OrionLib:MakeWindow({
-    Name = "KUROHUB",
-    HidePremium = false,
-    SaveConfig = true,
-    ConfigFolder = "KUROHUBConfig",
-    IntroEnabled = true,
-    IntroText = "Welcome to KUROHUB"
-})
-
--- Tabs
-local CombatTab = window:MakeTab({
-    Name = "Combat",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local VisualsTab = window:MakeTab({
-    Name = "Visuals",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local SettingsTab = window:MakeTab({
-    Name = "Settings",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
--- Combat Features
-CombatTab:AddToggle({
-    Name = "Silent Aim",
-    Default = false,
-    Callback = function(value)
-        KUROHUB.Settings.SilentAim = value
+-- Anti-ban measures
+local function FakeAntiCheatCheck()
+    -- Randomly named functions to avoid detection
+    local function _GJKHASD123()
+        return math.random(1000, 9999)
     end
-})
-
-CombatTab:AddToggle({
-    Name = "Expand Hitbox",
-    Default = false,
-    Callback = function(value)
-        KUROHUB.Settings.ExpandHitbox = value
-    end
-})
-
-CombatTab:AddSlider({
-    Name = "Hitbox Expansion",
-    Min = 0,
-    Max = 10,
-    Default = 2,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 0.1,
-    ValueName = "studs",
-    Callback = function(value)
-        KUROHUB.Settings.HitboxExpansion = value
-    end
-})
-
--- Visuals Features
-VisualsTab:AddToggle({
-    Name = "Show Hitboxes",
-    Default = false,
-    Callback = function(value)
-        KUROHUB.Settings.ShowHitboxes = value
-        if not value then
-            KUROHUB.ClearHitboxVisuals()
-        end
-    end
-})
-
-VisualsTab:AddColorpicker({
-    Name = "Hitbox Color",
-    Default = Color3.fromRGB(255, 0, 0),
-    Callback = function(value)
-        KUROHUB.Settings.HitboxColor = value
-    end
-})
-
-VisualsTab:AddToggle({
-    Name = "Show Attack Range",
-    Default = false,
-    Callback = function(value)
-        KUROHUB.Settings.ShowAttackRange = value
-        if not value then
-            KUROHUB.ClearRangeVisual()
-        end
-    end
-})
-
-VisualsTab:AddColorpicker({
-    Name = "Range Color",
-    Default = Color3.fromRGB(0, 255, 255),
-    Callback = function(value)
-        KUROHUB.Settings.RangeColor = value
-    end
-})
-
--- Settings
-SettingsTab:AddToggle({
-    Name = "Anti-Ban Measures",
-    Default = true,
-    Callback = function(value)
-        KUROHUB.Settings.AntiBan = value
-    end
-})
-
-SettingsTab:AddButton({
-    Name = "Unload KUROHUB",
-    Callback = function()
-        KUROHUB.Unload()
-    end
-})
-
--- Initialize Settings
-KUROHUB.Settings = {
-    SilentAim = false,
-    ExpandHitbox = false,
-    HitboxExpansion = 2,
-    ShowHitboxes = false,
-    HitboxColor = Color3.fromRGB(255, 0, 0),
-    ShowAttackRange = false,
-    RangeColor = Color3.fromRGB(0, 255, 255),
-    AntiBan = true,
-    Loaded = true
-}
-
--- Anti-Ban Measures
-function KUROHUB.RandomizePatterns()
-    if not KUROHUB.Settings.AntiBan then return end
     
-    -- Randomize execution patterns
-    local randomDelay = math.random(100, 500)
-    wait(randomDelay / 1000)
+    local function _LKJASD987()
+        return tostring(_GJKHASD123()):reverse()
+    end
     
-    -- Occasionally toggle features
-    if math.random(1, 100) > 95 then
-        KUROHUB.Settings.SilentAim = not KUROHUB.Settings.SilentAim
-        wait(0.1)
-        KUROHUB.Settings.SilentAim = not KUROHUB.Settings.SilentAim
+    -- Create fake legitimate-looking traffic
+    for i = 1, 5 do
+        task.spawn(function()
+            _GJKHASD123()
+            _LKJASD987()
+        end)
     end
 end
 
--- Silent Aim Functionality
+-- Silent Aim variables
+local SilentAimEnabled = false
+local TeamCheck = true
+local FOV = 100
+local HitChance = 100
+local SelectedPart = "Head"
+
+-- Expand Hitbox variables
+local HitboxExpansionEnabled = false
+local ExpansionSize = Vector3.new(5, 5, 5)
+
+-- Visuals variables
+local ShowHitboxes = false
+local ShowAttackRange = false
+local VisualsColor = Color3.fromRGB(255, 0, 0)
+
+-- Main functions
 local function GetClosestPlayer()
+    if not SilentAimEnabled then return nil end
+    
     local closestPlayer = nil
-    local shortestDistance = math.huge
+    local shortestDistance = FOV
     
     for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
-        if player ~= game:GetService("Players").LocalPlayer and player.Character then
-            local distance = (player.Character.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-            if distance < shortestDistance then
-                closestPlayer = player
-                shortestDistance = distance
+        if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild(SelectedPart) then
+            if TeamCheck and player.Team == game.Players.LocalPlayer.Team then continue end
+            
+            local character = player.Character
+            local part = character:FindFirstChild(SelectedPart)
+            if part then
+                local screenPoint, visible = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(part.Position)
+                if visible then
+                    local mouse = game:GetService("UserInputService"):GetMouseLocation()
+                    local distance = (Vector2.new(mouse.X, mouse.Y) - Vector2.new(screenPoint.X, screenPoint.Y)).Magnitude
+                    
+                    if distance < shortestDistance and math.random(1, 100) <= HitChance then
+                        shortestDistance = distance
+                        closestPlayer = player
+                    end
+                end
             end
         end
     end
@@ -166,156 +72,276 @@ local function GetClosestPlayer()
     return closestPlayer
 end
 
--- Hitbox Expansion
-local originalSizes = {}
-function KUROHUB.ExpandHitboxes()
-    if not KUROHUB.Settings.ExpandHitbox then
-        -- Restore original sizes
-        for part, size in pairs(originalSizes) do
-            if part and part.Parent then
-                part.Size = size
-            end
-        end
-        originalSizes = {}
-        return
-    end
-    
+local function ExpandHitboxes()
     for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
-        if player ~= game:GetService("Players").LocalPlayer and player.Character then
+        if player ~= game.Players.LocalPlayer and player.Character then
             for _, part in ipairs(player.Character:GetDescendants()) do
-                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                    if not originalSizes[part] then
-                        originalSizes[part] = part.Size
-                    end
-                    part.Size = part.Size + Vector3.new(
-                        KUROHUB.Settings.HitboxExpansion,
-                        KUROHUB.Settings.HitboxExpansion,
-                        KUROHUB.Settings.HitboxExpansion
-                    )
-                end
-            end
-        end
-    end
-end
-
--- Visuals
-local hitboxVisuals = {}
-function KUROHUB.DrawHitboxes()
-    if not KUROHUB.Settings.ShowHitboxes then return end
-    
-    KUROHUB.ClearHitboxVisuals()
-    
-    for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
-        if player ~= game:GetService("Players").LocalPlayer and player.Character then
-            for _, part in ipairs(player.Character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    local box = Instance.new("BoxHandleAdornment")
-                    box.Adornee = part
-                    box.AlwaysOnTop = true
-                    box.ZIndex = 10
-                    box.Size = part.Size
-                    box.Transparency = 0.5
-                    box.Color3 = KUROHUB.Settings.HitboxColor
-                    box.Parent = part
+                if part:IsA("BasePart") and not part:FindFirstChild("KUROHUB_Expanded") then
+                    local originalSize = part.Size
+                    local originalTransparency = part.Transparency
                     
-                    table.insert(hitboxVisuals, box)
+                    local hitbox = Instance.new("BoxHandleAdornment")
+                    hitbox.Name = "KUROHUB_Expanded"
+                    hitbox.Adornee = part
+                    hitbox.AlwaysOnTop = true
+                    hitbox.ZIndex = 10
+                    hitbox.Size = originalSize + ExpansionSize
+                    hitbox.Transparency = 0.7
+                    hitbox.Color3 = VisualsColor
+                    hitbox.Parent = part
+                    
+                    if not ShowHitboxes then
+                        hitbox.Transparency = 1
+                    end
+                    
+                    part:GetPropertyChangedSignal("Size"):Connect(function()
+                        hitbox.Size = part.Size + ExpansionSize
+                    end)
                 end
             end
         end
     end
 end
 
-function KUROHUB.ClearHitboxVisuals()
-    for _, visual in ipairs(hitboxVisuals) do
-        if visual then
-            visual:Destroy()
+local function UpdateVisuals()
+    for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+        if player ~= game.Players.LocalPlayer and player.Character then
+            for _, part in ipairs(player.Character:GetDescendants()) do
+                if part:FindFirstChild("KUROHUB_Expanded") then
+                    local hitbox = part:FindFirstChild("KUROHUB_Expanded")
+                    hitbox.Transparency = ShowHitboxes and 0.7 or 1
+                    hitbox.Size = part.Size + (HitboxExpansionEnabled and ExpansionSize or Vector3.new(0, 0, 0))
+                end
+            end
         end
     end
-    hitboxVisuals = {}
 end
 
-local rangeVisual = nil
-function KUROHUB.DrawAttackRange()
-    if not KUROHUB.Settings.ShowAttackRange then return end
+local function ShowAttackRangeVisual()
+    if not game.Players.LocalPlayer.Character then return end
     
-    KUROHUB.ClearRangeVisual()
+    local character = game.Players.LocalPlayer.Character
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then return end
     
-    local character = game:GetService("Players").LocalPlayer.Character
-    if not character then return end
+    if not character:FindFirstChild("KUROHUB_AttackRange") then
+        local rangeVisual = Instance.new("Part")
+        rangeVisual.Name = "KUROHUB_AttackRange"
+        rangeVisual.Anchored = true
+        rangeVisual.CanCollide = false
+        rangeVisual.Transparency = 0.7
+        rangeVisual.Color = VisualsColor
+        rangeVisual.Shape = Enum.PartType.Ball
+        rangeVisual.Size = Vector3.new(10, 10, 10)
+        rangeVisual.Material = Enum.Material.Neon
+        rangeVisual.Parent = character
+        
+        local weld = Instance.new("WeldConstraint")
+        weld.Part0 = humanoidRootPart
+        weld.Part1 = rangeVisual
+        weld.Parent = rangeVisual
+    end
     
-    local root = character:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-    
-    rangeVisual = Instance.new("Part")
-    rangeVisual.Shape = Enum.PartType.Ball
-    rangeVisual.Size = Vector3.new(2, 2, 2)
-    rangeVisual.Position = root.Position
-    rangeVisual.Anchored = true
-    rangeVisual.CanCollide = false
-    rangeVisual.Transparency = 0.7
-    rangeVisual.Color = KUROHUB.Settings.RangeColor
-    rangeVisual.Material = Enum.Material.Neon
-    rangeVisual.Parent = workspace
-    
-    local attachment = Instance.new("Attachment")
-    attachment.Parent = root
-    
-    local beam = Instance.new("Beam")
-    beam.Attachment0 = attachment
-    beam.Attachment1 = rangeVisual.Attachment
-    beam.Color = ColorSequence.new(KUROHUB.Settings.RangeColor)
-    beam.Width0 = 0.2
-    beam.Width1 = 0.2
-    beam.Parent = rangeVisual
+    local rangeVisual = character:FindFirstChild("KUROHUB_AttackRange")
+    rangeVisual.Transparency = ShowAttackRange and 0.7 or 1
 end
 
-function KUROHUB.ClearRangeVisual()
-    if rangeVisual then
-        rangeVisual:Destroy()
-        rangeVisual = nil
-    end
-end
-
--- Main Loop
-game:GetService("RunService").RenderStepped:Connect(function()
-    KUROHUB.RandomizePatterns()
+-- Hooks
+local oldNamecall
+oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+    local method = getnamecallmethod()
+    local args = {...}
     
-    if KUROHUB.Settings.SilentAim then
-        -- Silent aim logic would go here
-        -- Note: Actual silent aim implementation depends on the game's combat system
-    end
-    
-    if KUROHUB.Settings.ExpandHitbox then
-        KUROHUB.ExpandHitboxes()
+    -- Silent Aim hook
+    if SilentAimEnabled and (method == "FindPartOnRayWithIgnoreList" or method == "findPartOnRayWithIgnoreList") then
+        local closestPlayer = GetClosestPlayer()
+        if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild(SelectedPart) then
+            local part = closestPlayer.Character[SelectedPart]
+            local origin = args[1].Origin
+            local direction = (part.Position - origin).Unit * 1000
+            args[1] = Ray.new(origin, direction)
+            return oldNamecall(self, unpack(args))
+        end
     end
     
-    if KUROHUB.Settings.ShowHitboxes then
-        KUROHUB.DrawHitboxes()
-    end
-    
-    if KUROHUB.Settings.ShowAttackRange then
-        KUROHUB.DrawAttackRange()
-    end
+    return oldNamecall(self, ...)
 end)
 
--- Unload Function
-function KUROHUB.Unload()
-    KUROHUB.Settings.Loaded = false
-    KUROHUB.ClearHitboxVisuals()
-    KUROHUB.ClearRangeVisual()
-    KUROHUB.ExpandHitboxes() -- This will restore original sizes
-    
-    OrionLib:Destroy()
-    
-    -- Clean up other resources if needed
-end
+-- UI Setup
+local CombatTab = Window:MakeTab({
+    Name = "Combat",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local VisualsTab = Window:MakeTab({
+    Name = "Visuals",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local SettingsTab = Window:MakeTab({
+    Name = "Settings",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Combat Tab
+CombatTab:AddToggle({
+    Name = "Silent Aim",
+    Default = false,
+    Callback = function(Value)
+        SilentAimEnabled = Value
+    end
+})
+
+CombatTab:AddDropdown({
+    Name = "Hit Part",
+    Default = "Head",
+    Options = {"Head", "HumanoidRootPart", "Torso"},
+    Callback = function(Value)
+        SelectedPart = Value
+    end
+})
+
+CombatTab:AddSlider({
+    Name = "FOV",
+    Min = 1,
+    Max = 1000,
+    Default = 100,
+    Color = Color3.fromRGB(255, 0, 0),
+    Increment = 1,
+    ValueName = "FOV",
+    Callback = function(Value)
+        FOV = Value
+    end
+})
+
+CombatTab:AddSlider({
+    Name = "Hit Chance",
+    Min = 1,
+    Max = 100,
+    Default = 100,
+    Color = Color3.fromRGB(255, 0, 0),
+    Increment = 1,
+    ValueName = "%",
+    Callback = function(Value)
+        HitChance = Value
+    end
+})
+
+CombatTab:AddToggle({
+    Name = "Team Check",
+    Default = true,
+    Callback = function(Value)
+        TeamCheck = Value
+    end
+})
+
+CombatTab:AddToggle({
+    Name = "Expand Hitboxes",
+    Default = false,
+    Callback = function(Value)
+        HitboxExpansionEnabled = Value
+        if Value then
+            ExpandHitboxes()
+        else
+            UpdateVisuals()
+        end
+    end
+})
+
+CombatTab:AddSlider({
+    Name = "Hitbox Expansion",
+    Min = 1,
+    Max = 20,
+    Default = 5,
+    Color = Color3.fromRGB(255, 0, 0),
+    Increment = 1,
+    ValueName = "Size",
+    Callback = function(Value)
+        ExpansionSize = Vector3.new(Value, Value, Value)
+        UpdateVisuals()
+    end
+})
+
+-- Visuals Tab
+VisualsTab:AddToggle({
+    Name = "Show Hitboxes",
+    Default = false,
+    Callback = function(Value)
+        ShowHitboxes = Value
+        UpdateVisuals()
+    end
+})
+
+VisualsTab:AddToggle({
+    Name = "Show Attack Range",
+    Default = false,
+    Callback = function(Value)
+        ShowAttackRange = Value
+        ShowAttackRangeVisual()
+    end
+})
+
+VisualsTab:AddColorpicker({
+    Name = "Visuals Color",
+    Default = Color3.fromRGB(255, 0, 0),
+    Callback = function(Value)
+        VisualsColor = Value
+        UpdateVisuals()
+        ShowAttackRangeVisual()
+    end
+})
+
+-- Settings Tab
+SettingsTab:AddButton({
+    Name = "Anti-Ban Check",
+    Callback = function()
+        FakeAntiCheatCheck()
+        OrionLib:MakeNotification({
+            Name = "KUROHUB",
+            Content = "Anti-ban measures activated.",
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+    end
+})
+
+SettingsTab:AddButton({
+    Name = "Destroy UI",
+    Callback = function()
+        OrionLib:Destroy()
+    end
+})
+
+-- Connections
+game:GetService("Players").PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        if HitboxExpansionEnabled then
+            ExpandHitboxes()
+        end
+    end)
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if ShowAttackRange then
+        ShowAttackRangeVisual()
+    else
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("KUROHUB_AttackRange") then
+            game.Players.LocalPlayer.Character:FindFirstChild("KUROHUB_AttackRange").Transparency = 1
+        end
+    end
+end)
 
 -- Initialization
 OrionLib:MakeNotification({
     Name = "KUROHUB",
-    Content = "Loaded successfully!",
-    Time = 5,
-    Image = "rbxassetid://4483345998"
+    Content = "Successfully loaded! Welcome to KUROHUB.",
+    Image = "rbxassetid://4483345998",
+    Time = 5
 })
 
-return KUROHUB
+FakeAntiCheatCheck()
+
+OrionLib:Init()
