@@ -1,5 +1,10 @@
 local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexsoft/Orion/main/source"))()
-local Window = OrionLib:MakeWindow({Name = "APEX 3 DUEL Warriors Hub", HidePremium = true, SaveConfig = true, ConfigFolder = "APEX3Hub"})
+local Window = OrionLib:MakeWindow({
+    Name = "APEX 3 DUEL Warriors Hub",
+    HidePremium = true,
+    SaveConfig = true,
+    ConfigFolder = "APEX3Hub"
+})
 
 -- Cài đặt
 local Settings = {
@@ -32,7 +37,7 @@ MainTab:AddToggle({
         if state then
             spawn(function()
                 while Settings.AutoFarm do
-                    -- Logic Auto Farm
+                    print("Đang Auto Farm...")
                     wait(1)
                 end
             end)
@@ -49,8 +54,7 @@ MainTab:AddToggle({
             spawn(function()
                 while Settings.AutoDodge do
                     wait(0.1)
-                    if Settings.HealthThreshold and Humanoid.Health / Humanoid.MaxHealth < Settings.HealthThreshold then
-                        -- Né tránh
+                    if Humanoid.Health / Humanoid.MaxHealth < Settings.HealthThreshold then
                         game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Q, false, game)
                         wait(0.2)
                         game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.Q, false, game)
@@ -98,18 +102,31 @@ SecurityTab:AddToggle({
             spawn(function()
                 while Settings.SafeMode do
                     wait(math.random(10, 30))
-                    -- Kiểm tra admin
+                    -- Kiểm tra admin trong server
+                    local isAdmin = false
                     for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
                         if player:GetRankInGroup(1) > 100 then
-                            warn("[ANTI-BAN] Phát hiện admin, tự động tắt script")
-                            Settings.AutoFarm = false
-                            Settings.AutoSkills = false
-                            return
+                            isAdmin = true
+                            break
                         end
+                    end
+                    if isAdmin then
+                        warn("[ANTI-BAN] Phát hiện admin! Tự động tắt script.")
+                        Settings.AutoFarm = false
+                        Settings.AutoSkills = false
+                        break
                     end
                 end
             end)
         end
+    end
+})
+
+SecurityTab:AddToggle({
+    Name = "Giả lập hành vi",
+    Default = true,
+    Callback = function(state)
+        Settings.HumanLikeDelay = state
     end
 })
 
@@ -124,5 +141,5 @@ InfoTab:AddLabel("Phiên bản: 1.0.0")
 InfoTab:AddLabel("Cập nhật: 12/04/2025")
 InfoTab:AddLabel("Tác giả: Kuro07Hub")
 
--- Kích hoạt GUI
+-- Kích hoạt giao diện
 OrionLib:Init()
