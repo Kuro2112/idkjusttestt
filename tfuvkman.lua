@@ -1,6 +1,6 @@
--- KUROHUB v1.7 (Optimized for APEX-3-DUEL-Warriors)
--- Features: Silent Aim (Team Filter, Prediction), Dynamic Hitbox (Custom Colors), Weapon-Specific Range, Anti-Ban (Placebo), FOV Circle
--- GUI: Advanced Black/Red Menu with Tabs, Animations, Draggable Frame, Save/Load Settings
+-- KUROHUB v1.8 (Optimized for APEX-3-DUEL-Warriors)
+-- Features: Ultra Silent Aim (Prediction, Priority), Extreme Hitbox Expansion (Dynamic, Visuals), Weapon Range, Anti-Ban (Placebo)
+-- GUI: Polished Black/Red Menu with Tabs, Animations, Draggable Frame
 
 local Player = game:GetService("Players").LocalPlayer
 local Mouse = Player:GetMouse()
@@ -13,7 +13,14 @@ local SoundService = game:GetService("SoundService")
 
 -- Game-Specific Constants
 local GAME_NAME = "APEX-3-DUEL-Warriors"
-local HITBOX_PARTS = {"Head", "HumanoidRootPart", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}
+local HITBOX_PARTS = {
+    Head = 2.5, -- Higher multiplier for headshots
+    HumanoidRootPart = 2.0,
+    LeftArm = 1.5,
+    RightArm = 1.5,
+    LeftLeg = 1.5,
+    RightLeg = 1.5
+}
 local WEAPON_RANGES = {
     Sword = 10,
     Spear = 14,
@@ -24,9 +31,9 @@ local HITBOX_COLORS = {
     Blue = Color3.new(0, 0, 1),
     Purple = Color3.new(0.5, 0, 1)
 }
-local DEFAULT_AIM_RADIUS = 60
-local DEFAULT_HITBOX_SIZE = 1.4
-local DEFAULT_SMOOTHNESS = 0.1
+local DEFAULT_AIM_RADIUS = 80 -- Increased for wider coverage
+local DEFAULT_HITBOX_SIZE = 2.0 -- Base for stronger effect
+local DEFAULT_SMOOTHNESS = 0.08 -- Snappier aim
 
 -- GUI Setup
 local KUROHUB = Instance.new("ScreenGui")
@@ -40,7 +47,7 @@ MainFrame.Parent = KUROHUB
 MainFrame.BackgroundColor3 = Color3.new(0.05, 0, 0)
 MainFrame.BackgroundTransparency = 0.4
 MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
-MainFrame.Size = UDim2.new(0, 320, 0, 450)
+MainFrame.Size = UDim2.new(0, 300, 0, 400)
 MainFrame.ClipsDescendants = true
 
 local UICorner = Instance.new("UICorner")
@@ -62,7 +69,7 @@ TitleBar.BackgroundTransparency = 0.5
 TitleBar.Parent = MainFrame
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Text = "KUROHUB v1.7 | " .. GAME_NAME
+TitleLabel.Text = "KUROHUB v1.8 | " .. GAME_NAME
 TitleLabel.TextColor3 = Color3.new(1, 0, 0)
 TitleLabel.TextScaled = true
 TitleLabel.Size = UDim2.new(0.7, 0, 1, 0)
@@ -146,6 +153,8 @@ local Settings = {
     ShowAttackRange = false,
     AntiBan = false,
     TeamFilter = true,
+    AimLock = false, -- New: Lock onto one target
+    AimPriority = "Closest", -- Closest, LowHealth
     AimKey = Enum.KeyCode.Q,
     AimRadius = DEFAULT_AIM_RADIUS,
     HitboxSize = DEFAULT_HITBOX_SIZE,
@@ -154,6 +163,7 @@ local Settings = {
     AttackRange = WEAPON_RANGES.Sword,
     HitboxColor = "Red",
     DynamicHitbox = true,
+    HitboxParticles = false, -- New: Visual feedback
     AntiBanLevel = "Warrior Elite",
     FakeBanRisk = 0
 }
@@ -221,44 +231,44 @@ local AntiBanModule = {
     SimulateProtection = function()
         if not Settings.AntiBan then return end
         AntiBanModule.Active = true
-        AntiBanModule.Log("Initializing Anti-Ban v2.4 for " .. GAME_NAME)
+        AntiBanModule.Log("Initializing Anti-Ban v2.5 for " .. GAME_NAME)
         AntiBanModule.FakeTelemetry = {
             SessionID = HttpService:GenerateGUID(false),
             Timestamp = os.time(),
             FakeChecksum = math.random(1000000, 9999999),
             FakeWarriorKey = "WRLR-ELITE-" .. math.random(10000, 99999),
-            FakePing = math.random(15, 90),
-            FakeServerLoad = math.random(10, 50)
+            FakePing = math.random(15, 80)
         }
         AntiBanModule.Log("Elite Session ID: " .. AntiBanModule.FakeTelemetry.SessionID)
         AntiBanModule.Log("Protection Level: " .. Settings.AntiBanLevel)
-        AntiBanModule.Log("Server ping: " .. AntiBanModule.FakeTelemetry.FakePing .. "ms | Load: " .. AntiBanModule.FakeTelemetry.FakeServerLoad .. "%")
-        wait(0.5)
+        AntiBanModule.Log("Server ping: " .. AntiBanModule.FakeTelemetry.FakePing .. "ms")
+        wait(0.4)
         AntiBanModule.Log("Checksum validated: " .. AntiBanModule.FakeTelemetry.FakeChecksum)
         AntiBanModule.Log("Warrior Key: " .. AntiBanModule.FakeTelemetry.FakeWarriorKey)
         AntiBanModule.Log("Anti-Ban active (placebo, no protection).")
     end,
     SimulatePeriodicCheck = function()
-        while Settings.AntiBan and wait(math.random(4, 8)) do
+        while Settings.AntiBan and wait(math.random(3, 7)) do
             AntiBanModule.Log("Simulating " .. GAME_NAME .. " anti-cheat evasion...")
             AntiBanModule.FakeTelemetry.FakeChecksum = math.random(1000000, 9999999)
-            AntiBanModule.FakeTelemetry.FakePing = math.random(15, 90)
-            Settings.FakeBanRisk = math.clamp(Settings.FakeBanRisk + math.random(-5, 10), 0, 100)
+            AntiBanModule.FakeTelemetry.FakePing = math.random(15, 80)
+            Settings.FakeBanRisk = math.clamp(Settings.FakeBanRisk + math.random(-10, 15), 0, 100)
             AntiBanModule.Log("Checksum: " .. AntiBanModule.FakeTelemetry.FakeChecksum)
             AntiBanModule.Log("Ping: " .. AntiBanModule.FakeTelemetry.FakePing .. "ms")
             AntiBanModule.Log("Fake ban risk: " .. Settings.FakeBanRisk .. "%")
-            if math.random() > 0.6 then
-                AntiBanModule.Log("Spoofed " .. GAME_NAME .. " integrity check.")
-            end
         end
     end
 }
 
--- Silent Aim
+-- Ultra Silent Aim
+local LockedTarget = nil
 local function SilentAim()
-    if not Settings.SilentAim or not Player.Character or not Player.Character:FindFirstChild("HumanoidRootPart") then return end
+    if not Settings.SilentAim or not Player.Character or not Player.Character:FindFirstChild("HumanoidRootPart") then
+        LockedTarget = nil
+        return
+    end
     
-    local ClosestPlayer, ClosestDistance = nil, math.huge
+    local ClosestPlayer, ClosestScore = nil, math.huge
     local TargetCount = 0
     
     for _, v in pairs(game.Players:GetPlayers()) do
@@ -266,18 +276,32 @@ local function SilentAim()
             if Settings.TeamFilter and v.Team == Player.Team then continue end
             local Distance = (v.Character.HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude
             local ScreenPos, OnScreen = Camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-            if Distance < ClosestDistance and Distance <= Settings.AimRadius and OnScreen then
-                ClosestPlayer = v
-                ClosestDistance = Distance
-                TargetCount = TargetCount + 1
+            if Distance <= Settings.AimRadius and OnScreen then
+                local Score
+                if Settings.AimPriority == "Closest" then
+                    Score = Distance
+                elseif Settings.AimPriority == "LowHealth" then
+                    Score = v.Character.Humanoid.Health
+                end
+                if Score < ClosestScore and (not Settings.AimLock or LockedTarget == v or LockedTarget == nil) then
+                    ClosestPlayer = v
+                    ClosestScore = Score
+                    TargetCount = TargetCount + 1
+                end
             end
         end
+    end
+    
+    if Settings.AimLock and ClosestPlayer then
+        LockedTarget = ClosestPlayer
+    elseif not Settings.AimLock then
+        LockedTarget = nil
     end
     
     if Settings.ShowFOV then
         FOVCircle.Position = Player.Character.HumanoidRootPart.Position + Vector3.new(0, 5, 0)
         FOVFrame.Size = UDim2.new(0, Settings.AimRadius * 2, 0, Settings.AimRadius * 2)
-        FOVImage.ImageTransparency = ClosestPlayer and 0.4 or 0.7
+        FOVImage.ImageTransparency = ClosestPlayer and 0.3 or 0.7
     else
         FOVImage.ImageTransparency = 1
     end
@@ -285,38 +309,77 @@ local function SilentAim()
     if ClosestPlayer and ClosestPlayer.Character and ClosestPlayer.Character:FindFirstChild("HumanoidRootPart") then
         local TargetPart = ClosestPlayer.Character:FindFirstChild("Head") or ClosestPlayer.Character.HumanoidRootPart
         local Velocity = ClosestPlayer.Character.HumanoidRootPart.Velocity
-        local PredictedPos = TargetPart.Position + Velocity * Settings.AimSmoothness
+        local PingFactor = AntiBanModule.FakeTelemetry.FakePing and (AntiBanModule.FakeTelemetry.FakePing / 1000) or 0.05
+        local PredictedPos = TargetPart.Position + Velocity * (Settings.AimSmoothness + PingFactor)
         local MousePos = Camera:WorldToViewportPoint(PredictedPos)
-        mousemoverel((MousePos.X - Mouse.X) * Settings.AimSmoothness, (MousePos.Y - Mouse.Y) * Settings.AimSmoothness)
+        local DeltaX = (MousePos.X - Mouse.X) * Settings.AimSmoothness
+        local DeltaY = (MousePos.Y - Mouse.Y) * Settings.AimSmoothness
+        mousemoverel(DeltaX, DeltaY)
     end
     
     StatusBar.Text = string.format("FPS: %.1f | Targets: %d | Ban Risk: %d%%", 1 / RunService.RenderStepped:Wait(), TargetCount, Settings.FakeBanRisk)
 end
 
--- Dynamic Hitbox Expansion
+-- Extreme Hitbox Expansion
+local HitboxCache = {}
 local function ExpandHitbox()
-    if not Settings.ExpandHitbox then return end
+    if not Settings.ExpandHitbox then
+        -- Revert hitboxes
+        for _, v in pairs(game.Players:GetPlayers()) do
+            if v ~= Player and v.Character then
+                for partName, _ in pairs(HITBOX_PARTS) do
+                    local part = v.Character:FindFirstChild(partName)
+                    if part and part:FindFirstChild("KURO_SizeTag") then
+                        local OriginalSize = part:FindFirstChild("KURO_OriginalSize")
+                        if OriginalSize then
+                            part.Size = OriginalSize.Value
+                            OriginalSize:Destroy()
+                            part:FindFirstChild("KURO_SizeTag"):Destroy()
+                        end
+                    end
+                end
+                if Settings.HitboxParticles and v.Character:FindFirstChild("KURO_Particles") then
+                    v.Character.KURO_Particles:Destroy()
+                end
+            end
+        end
+        HitboxCache = {}
+        return
+    end
     
     for _, v in pairs(game.Players:GetPlayers()) do
         if v ~= Player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
             if Settings.TeamFilter and v.Team == Player.Team then continue end
             local Distance = (v.Character.HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude
-            local DynamicSize = Settings.DynamicHitbox and math.clamp(1 + Settings.HitboxSize * (1 - Distance / 50), 1, Settings.HitboxSize) or Settings.HitboxSize
+            local DynamicSize = Settings.DynamicHitbox and math.clamp(Settings.HitboxSize * (1 + (50 - Distance) / 25), Settings.HitboxSize, Settings.HitboxSize * 1.5) or Settings.HitboxSize
             
-            for _, partName in ipairs(HITBOX_PARTS) do
+            for partName, Multiplier in pairs(HITBOX_PARTS) do
                 local part = v.Character:FindFirstChild(partName)
-                if part and part:IsA("BasePart") and not part:FindFirstChild("KURO_SizeTag") then
-                    local SizeTag = Instance.new("BoolValue")
-                    SizeTag.Name = "KURO_SizeTag"
-                    SizeTag.Parent = part
-                    part.Size = part.Size * DynamicSize
-                    part:GetPropertyChangedSignal("Size"):Connect(function()
-                        if not Settings.ExpandHitbox then
-                            part.Size = part.Size / DynamicSize
-                            SizeTag:Destroy()
-                        end
-                    end)
+                if part and part:IsA("BasePart") then
+                    if not HitboxCache[v.UserId .. partName] then
+                        local OriginalSize = Instance.new("Vector3Value")
+                        OriginalSize.Name = "KURO_OriginalSize"
+                        OriginalSize.Value = part.Size
+                        OriginalSize.Parent = part
+                        local SizeTag = Instance.new("BoolValue")
+                        SizeTag.Name = "KURO_SizeTag"
+                        SizeTag.Parent = part
+                        HitboxCache[v.UserId .. partName] = true
+                    end
+                    part.Size = part:FindFirstChild("KURO_OriginalSize").Value * DynamicSize * Multiplier
                 end
+            end
+            
+            if Settings.HitboxParticles and not v.Character:FindFirstChild("KURO_Particles") then
+                local ParticleEmitter = Instance.new("ParticleEmitter")
+                ParticleEmitter.Name = "KURO_Particles"
+                ParticleEmitter.Texture = "rbxassetid://243098098" -- Sparkle effect
+                ParticleEmitter.Size = NumberSequence.new(0.2)
+                ParticleEmitter.Transparency = NumberSequence.new(0.5)
+                ParticleEmitter.Lifetime = NumberRange.new(0.5, 1)
+                ParticleEmitter.Rate = 10
+                ParticleEmitter.Color = ColorSequence.new(HITBOX_COLORS[Settings.HitboxColor])
+                ParticleEmitter.Parent = v.Character.HumanoidRootPart
             end
         end
     end
@@ -332,7 +395,7 @@ local function ShowHitbox()
                 Highlight.Name = "KURO_Highlight"
                 Highlight.FillColor = HITBOX_COLORS[Settings.HitboxColor]
                 Highlight.OutlineColor = Color3.new(0, 0, 0)
-                Highlight.FillTransparency = 0.4
+                Highlight.FillTransparency = 0.3
                 Highlight.OutlineTransparency = 0
                 Highlight.Parent = v.Character
             end
@@ -562,12 +625,15 @@ CreateTabButton("Anti-Ban", 0.75, "AntiBan")
 CreateButton("Silent Aim [Q]", 0.05, "SilentAim", Tabs.Aim)
 CreateButton("Show FOV [E]", 0.15, "ShowFOV", Tabs.Aim)
 CreateButton("Team Filter", 0.25, "TeamFilter", Tabs.Aim)
-CreateSlider("Aim Radius", 0.35, 20, 120, DEFAULT_AIM_RADIUS, "AimRadius", Tabs.Aim)
-CreateSlider("Aim Smoothness", 0.5, 0.05, 0.3, DEFAULT_SMOOTHNESS, "AimSmoothness", Tabs.Aim)
+CreateButton("Aim Lock", 0.35, "AimLock", Tabs.Aim)
+CreateDropdown("Aim Priority", 0.45, {"Closest", "LowHealth"}, "AimPriority", Tabs.Aim)
+CreateSlider("Aim Radius", 0.55, 20, 150, DEFAULT_AIM_RADIUS, "AimRadius", Tabs.Aim)
+CreateSlider("Aim Smoothness", 0.7, 0.05, 0.2, DEFAULT_SMOOTHNESS, "AimSmoothness", Tabs.Aim)
 
 CreateButton("Expand Hitbox [R]", 0.05, "ExpandHitbox", Tabs.Hitbox)
 CreateButton("Dynamic Hitbox", 0.15, "DynamicHitbox", Tabs.Hitbox)
-CreateSlider("Hitbox Size", 0.25, 1, 2, DEFAULT_HITBOX_SIZE, "HitboxSize", Tabs.Hitbox)
+CreateButton("Hitbox Particles", 0.25, "HitboxParticles", Tabs.Hitbox)
+CreateSlider("Hitbox Size", 0.35, 1, 3, DEFAULT_HITBOX_SIZE, "HitboxSize", Tabs.Hitbox)
 
 CreateButton("Show Hitbox [T]", 0.05, "ShowHitbox", Tabs.Visuals, function() if Settings.ShowHitbox then coroutine.wrap(ShowHitbox)() end end)
 CreateButton("Show Attack Range [Y]", 0.15, "ShowAttackRange", Tabs.Visuals, function() if Settings.ShowAttackRange then coroutine.wrap(ShowAttackRange)() end end)
@@ -614,7 +680,7 @@ local function Initialize()
         game.Loaded:Wait()
     end
     LoadSettings()
-    AntiBanModule.Log("KUROHUB v1.7 initialized for " .. GAME_NAME .. ".")
+    AntiBanModule.Log("KUROHUB v1.8 initialized for " .. GAME_NAME .. ".")
 end
 
 -- Main Loop
