@@ -1,4 +1,4 @@
--- KUROHUB v2.3 (Tối ưu cho APEX-3-DUEL-Warriors)
+-- KUROHUB v2.0 (Tối ưu cho APEX-3-DUEL-Warriors)
 -- Tính năng: Silent Aim Siêu Cấp, Mở Rộng Hitbox Cực Đại, Show Hitbox Sửa Lỗi, Anti-Ban Siêu Tinh Vi (Giả Lập)
 -- Giao diện: Phong cách Redz Hub (Neon, Đen/Xám, Hiệu ứng Mượt), Thu Nhỏ Thành Khối Vuông với Hình Mặt Trời Ria Mép
 
@@ -88,7 +88,7 @@ LogoLabel.Parent = TitleBar
 LogoLabel.ZIndex = 3
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Text = "v2.3 | " .. GAME_NAME
+TitleLabel.Text = "v2.0 | " .. GAME_NAME
 TitleLabel.TextColor3 = Color3.new(1, 1, 1)
 TitleLabel.TextScaled = true
 TitleLabel.Size = UDim2.new(0.4, 0, 0.6, 0)
@@ -298,8 +298,6 @@ local Settings = {
     WeaponMode = "Sword",
     AttackRange = WEAPON_RANGES.Sword,
     HitboxColor = "Red",
-    DynamicHitbox = true,
-    HitboxParticles = false,
     AntiBanLevel = "Chiến Thần Vô Hạn",
     FakeBanRisk = 0,
     ProtectionProgress = 0
@@ -516,9 +514,6 @@ local function ExpandHitbox()
                         end
                     end
                 end
-                if v.Character:FindFirstChild("KURO_Particles") then
-                    v.Character.KURO_Particles:Destroy()
-                end
             end
         end
         HitboxCache = {}
@@ -528,9 +523,7 @@ local function ExpandHitbox()
     for _, v in pairs(game.Players:GetPlayers()) do
         if v ~= Player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
             if Settings.TeamFilter and v.Team == Player.Team then continue end
-            local Distance = (v.Character.HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude
             local RandomSize = Settings.HitboxSize * (Settings.AntiBan and math.random(95, 105) / 100 or 1)
-            local DynamicSize = Settings.DynamicHitbox and math.clamp(RandomSize * (1 + (60 - Distance) / 20), RandomSize, RandomSize * 2) or RandomSize
             
             for partName, Multiplier in pairs(HITBOX_PARTS) do
                 local part = v.Character:FindFirstChild(partName)
@@ -545,20 +538,8 @@ local function ExpandHitbox()
                         SizeTag.Parent = part
                         HitboxCache[v.UserId .. partName] = true
                     end
-                    part.Size = part:FindFirstChild("KURO_OriginalSize").Value * DynamicSize * Multiplier
+                    part.Size = part:FindFirstChild("KURO_OriginalSize").Value * RandomSize * Multiplier
                 end
-            end
-            
-            if Settings.HitboxParticles and not v.Character:FindFirstChild("KURO_Particles") then
-                local ParticleEmitter = Instance.new("ParticleEmitter")
-                ParticleEmitter.Name = "KURO_Particles"
-                ParticleEmitter.Texture = "rbxassetid://243098098"
-                ParticleEmitter.Size = NumberSequence.new(0.3)
-                ParticleEmitter.Transparency = NumberSequence.new(0.6)
-                ParticleEmitter.Lifetime = NumberRange.new(0.4, 0.8)
-                ParticleEmitter.Rate = 8
-                ParticleEmitter.Color = ColorSequence.new(HITBOX_COLORS[Settings.HitboxColor])
-                ParticleEmitter.Parent = v.Character.HumanoidRootPart
             end
         end
     end
@@ -885,9 +866,7 @@ CreateSlider("Tầm ngắm", 0.55, 20, 200, DEFAULT_AIM_RADIUS, "AimRadius", Tab
 CreateSlider("Độ mượt ngắm", 0.7, 0.03, 0.15, DEFAULT_SMOOTHNESS, "AimSmoothness", Tabs.Aim)
 
 CreateButton("Mở rộng Hitbox [R]", 0.05, "ExpandHitbox", Tabs.Hitbox)
-CreateButton("Hitbox động", 0.15, "DynamicHitbox", Tabs.Hitbox)
-CreateButton("Hiệu ứng Hitbox", 0.25, "HitboxParticles", Tabs.Hitbox)
-CreateSlider("Kích thước Hitbox", 0.35, 1, 4, DEFAULT_HITBOX_SIZE, "HitboxSize", Tabs.Hitbox)
+CreateSlider("Kích thước Hitbox", 0.15, 1, 4, DEFAULT_HITBOX_SIZE, "HitboxSize", Tabs.Hitbox)
 
 CreateButton("Hiển thị Hitbox [T]", 0.05, "ShowHitbox", Tabs.Visuals, function()
     if Settings.ShowHitbox then
@@ -957,7 +936,7 @@ local function Initialize()
         game.Loaded:Wait()
     end
     LoadSettings()
-    AntiBanModule.Log("KUROHUB v2.3 khởi tạo cho " .. GAME_NAME .. ".")
+    AntiBanModule.Log("KUROHUB v2.0 khởi tạo cho " .. GAME_NAME .. ".")
 end
 
 -- Vòng lặp chính
