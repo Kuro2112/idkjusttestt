@@ -1,4 +1,4 @@
--- KUROHUB v2.3 (Tối ưu cho APEX-3-DUEL-Warriors)
+-- KUROHUB v2.4 (Tối ưu cho APEX-3-DUEL-Warriors)
 -- Tính năng: Silent Aim Siêu Cấp, Mở Rộng Hitbox Cực Đại, Show Hitbox Sửa Lỗi, Anti-Ban Siêu Tinh Vi (Giả Lập)
 -- Giao diện: Phong cách Redz Hub (Neon, Đen/Xám, Hiệu ứng Mượt), Thu Nhỏ Thành Khối Vuông Đen
 
@@ -48,7 +48,8 @@ MainFrame.BackgroundColor3 = Color3.new(0.08, 0.08, 0.08)
 MainFrame.BackgroundTransparency = 0.2
 MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
 MainFrame.Size = UDim2.new(0, 320, 0, 420)
-MainFrame.ClipsDescendants = true
+MainFrame.ClipsDescendants = false
+MainFrame.ZIndex = 1
 
 local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 12)
@@ -73,6 +74,7 @@ TitleBar.Size = UDim2.new(1, 0, 0, 40)
 TitleBar.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 TitleBar.BackgroundTransparency = 0.4
 TitleBar.Parent = MainFrame
+TitleBar.ZIndex = 2
 
 local LogoLabel = Instance.new("TextLabel")
 LogoLabel.Text = "KUROHUB"
@@ -83,9 +85,10 @@ LogoLabel.Position = UDim2.new(0.05, 0, 0.1, 0)
 LogoLabel.BackgroundTransparency = 1
 LogoLabel.Font = Enum.Font.SourceSansPro
 LogoLabel.Parent = TitleBar
+LogoLabel.ZIndex = 3
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Text = "v2.3 | " .. GAME_NAME
+TitleLabel.Text = "v2.4 | " .. GAME_NAME
 TitleLabel.TextColor3 = Color3.new(1, 1, 1)
 TitleLabel.TextScaled = true
 TitleLabel.Size = UDim2.new(0.4, 0, 0.6, 0)
@@ -93,6 +96,7 @@ TitleLabel.Position = UDim2.new(0.35, 0, 0.2, 0)
 TitleLabel.BackgroundTransparency = 1
 TitleLabel.Font = Enum.Font.SourceSansPro
 TitleLabel.Parent = TitleBar
+TitleLabel.ZIndex = 3
 
 local CloseButton = Instance.new("TextButton")
 CloseButton.Text = "X"
@@ -103,6 +107,7 @@ CloseButton.Position = UDim2.new(1, -35, 0, 5)
 CloseButton.TextScaled = true
 CloseButton.Font = Enum.Font.SourceSansPro
 CloseButton.Parent = TitleBar
+CloseButton.ZIndex = 3
 CloseButton.MouseButton1Click:Connect(function()
     KUROHUB.Enabled = false
 end)
@@ -120,6 +125,7 @@ MinimizeButton.Position = UDim2.new(1, -70, 0, 5)
 MinimizeButton.TextScaled = true
 MinimizeButton.Font = Enum.Font.SourceSansPro
 MinimizeButton.Parent = TitleBar
+MinimizeButton.ZIndex = 3
 
 local UICornerMinimize = Instance.new("UICorner")
 UICornerMinimize.CornerRadius = UDim.new(0, 8)
@@ -136,6 +142,7 @@ MinimizedSquare.TextScaled = true
 MinimizedSquare.Font = Enum.Font.SourceSansPro
 MinimizedSquare.Visible = false
 MinimizedSquare.Parent = KUROHUB
+MinimizedSquare.ZIndex = 1
 
 local SquareUICorner = Instance.new("UICorner")
 SquareUICorner.CornerRadius = UDim.new(0, 12)
@@ -186,7 +193,6 @@ local function ToggleMinimize()
     isMinimized = not isMinimized
     
     if isMinimized then
-        -- Thu nhỏ thành khối vuông
         local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         TweenService:Create(MainFrame, tweenInfo, {Size = UDim2.new(0, 50, 0, 50), Rotation = 5}):Play()
         wait(0.4)
@@ -197,10 +203,12 @@ local function ToggleMinimize()
         TweenService:Create(MinimizedSquare, tweenInfo, {Rotation = 0}):Play()
         MinimizeButton.Text = "+"
         for _, child in pairs(MainFrame:GetChildren()) do
-            child.Visible = false
+            if child ~= TitleBar then
+                child.Visible = false
+            end
         end
+        TitleBar.Visible = false
     else
-        -- Mở lại menu
         local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         MainFrame.Visible = true
         MainFrame.Position = MinimizedSquare.Position
@@ -212,6 +220,7 @@ local function ToggleMinimize()
         for _, child in pairs(MainFrame:GetChildren()) do
             child.Visible = true
         end
+        TitleBar.Visible = true
     end
 end
 
@@ -225,13 +234,14 @@ TabFrame.Position = UDim2.new(0, 5, 0, 45)
 TabFrame.BackgroundTransparency = 0.6
 TabFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 TabFrame.Parent = MainFrame
+TabFrame.ZIndex = 3
 
 local ContentFrame = Instance.new("Frame")
 ContentFrame.Size = UDim2.new(1, -10, 1, -120)
 ContentFrame.Position = UDim2.new(0, 5, 0, 85)
 ContentFrame.BackgroundTransparency = 1
-ContentFrame.ClipsDescendants = true
 ContentFrame.Parent = MainFrame
+ContentFrame.ZIndex = 4
 
 local StatusBar = Instance.new("TextLabel")
 StatusBar.Text = "FPS: -- | Mục tiêu: 0 | Rủi ro: An Toàn"
@@ -243,6 +253,7 @@ StatusBar.Position = UDim2.new(0, 5, 1, -30)
 StatusBar.TextScaled = true
 StatusBar.Font = Enum.Font.SourceSansPro
 StatusBar.Parent = MainFrame
+StatusBar.ZIndex = 5
 
 local StatusUICorner = Instance.new("UICorner")
 StatusUICorner.CornerRadius = UDim.new(0, 6)
@@ -254,11 +265,13 @@ ProtectionBarFrame.Size = UDim2.new(0.9, 0, 0, 15)
 ProtectionBarFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
 ProtectionBarFrame.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
 ProtectionBarFrame.Parent = nil
+ProtectionBarFrame.ZIndex = 5
 
 local ProtectionBarFill = Instance.new("Frame")
 ProtectionBarFill.Size = UDim2.new(0, 0, 1, 0)
 ProtectionBarFill.BackgroundColor3 = Color3.new(0, 0.75, 1)
 ProtectionBarFill.Parent = ProtectionBarFrame
+ProtectionBarFill.ZIndex = 6
 
 local UICornerProtection = Instance.new("UICorner")
 UICornerProtection.CornerRadius = UDim.new(0, 4)
@@ -277,6 +290,7 @@ ProtectionLabel.BackgroundTransparency = 1
 ProtectionLabel.TextScaled = true
 ProtectionLabel.Font = Enum.Font.SourceSansPro
 ProtectionLabel.Parent = nil
+ProtectionLabel.ZIndex = 5
 
 -- Cài đặt
 local Settings = {
@@ -633,6 +647,7 @@ local function CreateButton(Text, YPos, Setting, Parent, Callback)
     Button.TextScaled = true
     Button.Font = Enum.Font.SourceSansPro
     Button.Parent = Parent
+    Button.ZIndex = 5
     
     local UICornerBtn = Instance.new("UICorner")
     UICornerBtn.CornerRadius = UDim.new(0, 8)
@@ -672,6 +687,7 @@ local function CreateSlider(Text, YPos, Min, Max, Default, Setting, Parent)
     SliderFrame.Size = UDim2.new(0.9, 0, 0, 45)
     SliderFrame.BackgroundTransparency = 1
     SliderFrame.Parent = Parent
+    SliderFrame.ZIndex = 5
     
     local Label = Instance.new("TextLabel")
     Label.Text = Text .. ": " .. Settings[Setting]
@@ -681,6 +697,7 @@ local function CreateSlider(Text, YPos, Min, Max, Default, Setting, Parent)
     Label.TextScaled = true
     Label.Font = Enum.Font.SourceSansPro
     Label.Parent = SliderFrame
+    Label.ZIndex = 6
     
     local Slider = Instance.new("TextButton")
     Slider.Text = ""
@@ -688,6 +705,7 @@ local function CreateSlider(Text, YPos, Min, Max, Default, Setting, Parent)
     Slider.Size = UDim2.new(1, 0, 0, 8)
     Slider.Position = UDim2.new(0, 0, 0, 25)
     Slider.Parent = SliderFrame
+    Slider.ZIndex = 6
     
     local UICornerSlider = Instance.new("UICorner")
     UICornerSlider.CornerRadius = UDim.new(0, 4)
@@ -697,6 +715,7 @@ local function CreateSlider(Text, YPos, Min, Max, Default, Setting, Parent)
     Fill.BackgroundColor3 = Color3.new(0, 0.75, 1)
     Fill.Size = UDim2.new((Settings[Setting] - Min) / (Max - Min), 0, 1, 0)
     Fill.Parent = Slider
+    Fill.ZIndex = 7
     
     local UICornerFill = Instance.new("UICorner")
     UICornerFill.CornerRadius = UDim.new(0, 4)
@@ -734,6 +753,7 @@ local function CreateDropdown(Text, YPos, Options, Setting, Parent, Callback)
     Dropdown.TextScaled = true
     Dropdown.Font = Enum.Font.SourceSansPro
     Dropdown.Parent = Parent
+    Dropdown.ZIndex = 5
     
     local UICornerBtn = Instance.new("UICorner")
     UICornerBtn.CornerRadius = UDim.new(0, 8)
@@ -752,6 +772,7 @@ local function CreateDropdown(Text, YPos, Options, Setting, Parent, Callback)
     OptionFrame.BackgroundTransparency = 0.5
     OptionFrame.Visible = false
     OptionFrame.Parent = Dropdown
+    OptionFrame.ZIndex = 6
     
     local UICornerOption = Instance.new("UICorner")
     UICornerOption.CornerRadius = UDim.new(0, 8)
@@ -767,6 +788,7 @@ local function CreateDropdown(Text, YPos, Options, Setting, Parent, Callback)
         OptionBtn.TextScaled = true
         OptionBtn.Font = Enum.Font.SourceSansPro
         OptionBtn.Parent = OptionFrame
+        OptionBtn.ZIndex = 7
         OptionBtn.MouseButton1Click:Connect(function()
             SoundService:PlayLocalSound(ClickSound)
             Settings[Setting] = option
@@ -798,6 +820,7 @@ for _, tab in pairs(Tabs) do
     tab.BackgroundTransparency = 1
     tab.Visible = false
     tab.Parent = ContentFrame
+    tab.ZIndex = 4
 end
 Tabs.Aim.Visible = true
 
@@ -813,6 +836,7 @@ local function CreateTabButton(Text, XPos, Tab)
     Button.TextScaled = true
     Button.Font = Enum.Font.SourceSansPro
     Button.Parent = TabFrame
+    Button.ZIndex = 4
     
     local UICornerBtn = Instance.new("UICorner")
     UICornerBtn.CornerRadius = UDim.new(0, 8)
@@ -823,6 +847,7 @@ local function CreateTabButton(Text, XPos, Tab)
     UIStrokeBtn.Thickness = 1
     UIStrokeBtn.Transparency = 0.5
     UIStrokeBtn.Parent = Button
+    UIStrokeBtn.Name = "UIStroke"
     
     Button.MouseEnter:Connect(function()
         TweenService:Create(Button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.new(0, 0.75, 1), BackgroundTransparency = 0.3}):Play()
@@ -841,10 +866,10 @@ local function CreateTabButton(Text, XPos, Tab)
         Tabs[Tab].Visible = true
         for _, b in pairs(TabButtons) do
             b.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
-            b.UIStroke.Transparency = 0.5
+            b:FindFirstChild("UIStroke").Transparency = 0.5
         end
         Button.BackgroundColor3 = Color3.new(0, 0.5, 0.8)
-        Button.UIStroke.Transparency = 0
+        Button:FindFirstChild("UIStroke").Transparency = 0
     end)
     table.insert(TabButtons, Button)
 end
@@ -932,9 +957,7 @@ RiskLabel.BackgroundTransparency = 1
 RiskLabel.TextScaled = true
 RiskLabel.Font = Enum.Font.SourceSansPro
 RiskLabel.Parent = Tabs.AntiBan
-
-ProtectionBarFrame.Parent = Tabs.AntiBan
-ProtectionLabel.Parent = Tabs.AntiBan
+RiskLabel.ZIndex = 5
 
 -- Kiểm tra an toàn
 local function Initialize()
@@ -946,7 +969,7 @@ local function Initialize()
         game.Loaded:Wait()
     end
     LoadSettings()
-    AntiBanModule.Log("KUROHUB v2.3 khởi tạo cho " .. GAME_NAME .. ".")
+    AntiBanModule.Log("KUROHUB v2.4 khởi tạo cho " .. GAME_NAME .. ".")
 end
 
 -- Vòng lặp chính
