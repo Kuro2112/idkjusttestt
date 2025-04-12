@@ -197,7 +197,7 @@ end
 local function CreateGUI()
     -- Library UI
     local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-    local Window = Library.CreateLib("Dual Warrior Pro", "Sentinel")
+    local Window = Library.CreateLib("Kuro07Hub", "Sentinel")
     
     -- Tab chính
     local MainTab = Window:NewTab("Auto Farm")
