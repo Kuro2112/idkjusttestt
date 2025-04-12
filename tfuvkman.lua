@@ -1,4 +1,4 @@
--- KUROHUB v2.4 (Tối ưu cho APEX-3-DUEL-Warriors)
+-- KUROHUB v2.3 (Tối ưu cho APEX-3-DUEL-Warriors)
 -- Tính năng: Silent Aim Siêu Cấp, Mở Rộng Hitbox Cực Đại, Show Hitbox Sửa Lỗi, Anti-Ban Siêu Tinh Vi (Giả Lập)
 -- Giao diện: Phong cách Redz Hub (Neon, Đen/Xám, Hiệu ứng Mượt), Thu Nhỏ Thành Khối Vuông với Hình Mặt Trời Ria Mép
 
@@ -88,7 +88,7 @@ LogoLabel.Parent = TitleBar
 LogoLabel.ZIndex = 3
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Text = "v2.4 | " .. GAME_NAME
+TitleLabel.Text = "v2.3 | " .. GAME_NAME
 TitleLabel.TextColor3 = Color3.new(1, 1, 1)
 TitleLabel.TextScaled = true
 TitleLabel.Size = UDim2.new(0.4, 0, 0.6, 0)
@@ -957,7 +957,7 @@ local function Initialize()
         game.Loaded:Wait()
     end
     LoadSettings()
-    AntiBanModule.Log("KUROHUB v2.4 khởi tạo cho " .. GAME_NAME .. ".")
+    AntiBanModule.Log("KUROHUB v2.3 khởi tạo cho " .. GAME_NAME .. ".")
 end
 
 -- Vòng lặp chính
