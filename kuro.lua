@@ -193,7 +193,85 @@ local function Initialize()
         end
     end)
 end
+-- Thêm phần này vào trước hàm Initialize()
+local function CreateGUI()
+    -- Library UI
+    local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+    local Window = Library.CreateLib("Dual Warrior Pro", "Sentinel")
+    
+    -- Tab chính
+    local MainTab = Window:NewTab("Auto Farm")
+    local CombatSection = MainTab:NewSection("Combat Settings")
+    local SkillSection = MainTab:NewSection("Skill Settings")
+    
+    -- Tab bảo mật
+    local SecurityTab = Window:NewTab("Security")
+    local AntiBanSection = SecurityTab:NewSection("Anti-Ban System")
+    local SafetySection = SecurityTab:NewSection("Safety Features")
+    
+    -- Tab thông tin
+    local InfoTab = Window:NewTab("Info")
+    local CreditsSection = InfoTab:NewSection("Credits")
+    
+    -- ===== CÁC CHỨC NĂNG CHÍNH =====
+    -- Auto Farm
+    CombatSection:NewToggle("Auto Farm", "Tự động tấn công quái", function(state)
+        Settings.AutoFarm = state
+        if state then
+            spawn(CoreCombatLoop)
+        end
+    end)
+    
+    CombatSection:NewSlider("Khoảng cách mục tiêu", "MaxDistance", 500, 20, function(value)
+        Settings.MaxTargetDistance = value
+    end)
+    
+    -- Kỹ năng
+    SkillSection:NewToggle("Tự động dùng skill", "Kích hoạt combo skill", function(state)
+        Settings.AutoSkills = state
+    end)
+    
+    SkillSection:NewDropdown("Ưu tiên skill", "Chọn skill chính", DualWarriorSkills, function(selected)
+        _G.PrioritySkill = selected
+    end)
+    
+    -- Bảo mật
+    AntiBanSection:NewToggle("Chế độ an toàn", "Tự động tắt khi có admin", function(state)
+        Settings.SafeMode = state
+    end)
+    
+    AntiBanSection:NewToggle("Giả lập hành vi", "Hành động ngẫu nhiên", function(state)
+        Settings.HumanLikeDelay = state
+    end)
+    
+    SafetySection:NewToggle("Tự động né", "Khi máu thấp", function(state)
+        Settings.AutoDodge = state
+    end)
+    
+    SafetySection:NewSlider("Ngưỡng máu", "Health%", 100, 10, function(value)
+        Settings.HealthThreshold = value/100
+    end)
+    
+    -- Thông tin
+    CreditsSection:NewLabel("Phiên bản: 1.0.3")
+    CreditsSection:NewLabel("Cập nhật: 15/07/2024")
+    CreditsSection:NewLabel("Tác giả: Kuro2112")
+end
 
+-- Sửa hàm Initialize() thành:
+local function Initialize()
+    warn("Dual Warrior Script initialized")
+    CreateGUI() -- Tạo giao diện
+    
+    game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
+        Character = Player.Character
+        Humanoid = Character:WaitForChild("Humanoid")
+        HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+    end)
+    
+    spawn(CoreCombatLoop)
+    spawn(PositionCheckThread)
+end
 -- Kích hoạt script
 Initialize()
 -- VER: 1.0.3 | Last Updated: 2024-07-15
